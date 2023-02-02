@@ -47,11 +47,23 @@ public class BoardComponent : MonoBehaviour
 
 
     [SerializeField]
-    private Tile _dirtTile;
+    private Tile _defaultDirtTile;
     [SerializeField]
-    private Tile _rockTile;
+    private Tile[] _dirtTiles;
+    private HashSet<Tile> _dirtSet;
+
     [SerializeField]
-    private Tile _obscureTile;  // Tile style when you're not able to see actual content of layer
+    private Tile _defaultRockTile;
+    [SerializeField]
+    private Tile[] _rockTiles;
+    private HashSet<Tile> _rockSet;
+
+    [SerializeField]
+    private Tile _defaultObscureTile;  // Tile style when you're not able to see actual content of layer
+    [SerializeField]
+    private Tile[] _obscureTiles;
+    private HashSet<Tile> _obscureSet;
+
     [SerializeField]
     private GameObject _grid;         // Grid containing tilemap
     [SerializeField]
@@ -75,8 +87,8 @@ public class BoardComponent : MonoBehaviour
         Debug.Assert(_rootTilemap != null, "Missing Root Tilemap component from board object");
         Debug.Assert(_visibilityTilemap != null, "Missing visibility Tilemap component from board object");
         Debug.Assert(_playableTilemap != null, "Missing playable Tilemap component from board object");
-        Debug.Assert(_dirtTile != null, "Missing Dirt Tile property in board object");
-        Debug.Assert(_rockTile != null, "Missing Rock Tile property in board object");
+        Debug.Assert(_defaultDirtTile != null, "Missing Dirt Tile property in board object");
+        Debug.Assert(_defaultRockTile != null, "Missing Rock Tile property in board object");
         Debug.Assert(_grid != null, "Missing Grid property in board object");
         Debug.Assert(_cam != null, "Missing camera property in board object");
 
@@ -86,8 +98,6 @@ public class BoardComponent : MonoBehaviour
 
         // Init board
         InitBoard();
-        UpdateTileMap();
-
     }
 
     // Update is called once per frame
@@ -98,13 +108,27 @@ public class BoardComponent : MonoBehaviour
 
     private void InitBoard()
     {
+        // Init set of tiles
+        _dirtSet = new HashSet<Tile>();
+        foreach (var tile in _dirtTiles)
+            _dirtSet.Add(tile);
+
+        _rockSet = new HashSet<Tile>();
+        foreach (var tile in _rockTiles)
+            _rockSet.Add(tile);
+
+        _obscureSet = new HashSet<Tile>();
+        foreach (var tile in _obscureTiles)
+            _obscureSet.Add(tile);
+
+
         // We need to initialize board height and width by querying the playable area what size does it have
         Vector3Int size = _playableTilemap.size;
         _boardHeight = size.y;
         _boardWidth = size.x;
 
         _origin = new Vector3Int(_playableTilemap.cellBounds.xMin, _playableTilemap.cellBounds.yMax, 0) + Vector3Int.down;
-        _playableTilemap.SetTile(_origin, _rockTile);
+        _playableTilemap.SetTile(_origin, _defaultRockTile);
 
         _nTileTypes = Enum.GetNames(typeof(TileTypes)).Length;
         _nLayers = Enum.GetNames(typeof(Layers)).Length;
@@ -125,7 +149,9 @@ public class BoardComponent : MonoBehaviour
 
     private void SetUpTilemap()
     {
-        
+        // antes aqui hacia lo de cuadrar la escala, aqui creo que haremos el 
+        // tema del aspect ratio
+
         
     }
 
@@ -134,13 +160,13 @@ public class BoardComponent : MonoBehaviour
         switch (type)
         {
             case TileTypes.Dirt:
-                return _dirtTile;
+                return _defaultDirtTile;
             case TileTypes.Rock:
-                return _rockTile;
+                return _defaultRockTile;
             case TileTypes.Nothing:
                 return null;
             case TileTypes.Invisible:
-                return _obscureTile;
+                return _defaultObscureTile;
             default:
                 Debug.LogError("Unknown Type of Tile. Maybe you forgot to handle a new type of tile?");
                 break;
@@ -151,13 +177,13 @@ public class BoardComponent : MonoBehaviour
 
     private TileTypes TileToType(Tile tile)
     {
-        if (tile == _dirtTile)
+        if (_dirtSet.Contains(tile))
             return TileTypes.Dirt;
         if (tile == null)
             return TileTypes.Nothing;
-        if (tile == _rockTile)
+        if (_rockSet.Contains(tile))
             return TileTypes.Rock;
-        if (tile == _obscureTile)
+        if (_obscureSet.Contains(tile))
             return TileTypes.Invisible;
 
         Debug.LogError("Unknown tile");
