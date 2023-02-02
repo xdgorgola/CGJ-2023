@@ -32,21 +32,23 @@ public class PlantComponent : MonoBehaviour
     }
 
     public void ChangeWaterCount(float cost)
-    {   
-        if (agua + cost<= maxAgua && agua + cost >= 0)
+    {
+        float newWater = Mathf.Clamp(vida + cost, 0, maxAgua);
+        if (newWater < maxAgua && newWater > 0)
         {
-            agua = agua + cost;
+            agua = newWater;
         }
         
     }
 
     public void UpdateLife(float cost)
     {
-        if (vida + cost <= maxVida && vida + cost > 0)
+        float newLife = Mathf.Clamp(vida + cost, 0, maxVida);
+        if (newLife < maxVida && newLife > 0)
         {
-            vida = vida + cost;
+            vida = newLife;
         }
-        else if (vida + cost == 0)
+        else if (newLife == 0)
         {
             OnFlowerDeath.Invoke();
         }
@@ -54,12 +56,13 @@ public class PlantComponent : MonoBehaviour
     }
 
     public void UpdateNutrients(float cost)
-    {
-        if (nutrientes + cost < maxNutrientes && nutrientes + cost >= 0)
+    {   
+        float newNutrients = Mathf.Clamp(nutrientes + cost, 0, maxNutrientes);
+        if (newNutrients < maxNutrientes && newNutrients > 0)
         {
-            nutrientes = nutrientes + cost;
+            nutrientes = newNutrients;
         }
-        else if (nutrientes + cost == maxNutrientes)
+        else if (newNutrients == maxNutrientes)
         {
             //TRIGGER PARA CONSEGUIR MEJORA
             OnNutrientsCap.Invoke();
