@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using TMPro;
+
 
 public class DeckScript : MonoBehaviour
 {
@@ -21,7 +20,6 @@ public class DeckScript : MonoBehaviour
     private List<GameCards> deckDescarte = new List<GameCards>();
     public Text deckDescarteText;
 
-
     
     //intento de funcion para sacar carta
     public GameCards DrawCard()
@@ -38,17 +36,20 @@ public class DeckScript : MonoBehaviour
             return DrawCard();
         }
     }
+
+
     public void CardUsed(GameCards cartaUsada)
     {
-        deckDescarte.Add(cartaUsada);
-              
+        deckDescarte.Add(cartaUsada);     
     }
+
 
     public void addCard(GameCards cartaNueva)
     {
         deckJugable.Add(cartaNueva);
         deckCompleto.Add(cartaNueva);
     }
+
 
     private void shuffle()
     {
@@ -62,6 +63,7 @@ public class DeckScript : MonoBehaviour
     {
       CardUsed(DrawCard());
     }
+
     
     void Update()
     {

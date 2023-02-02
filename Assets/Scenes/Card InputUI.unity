@@ -522,7 +522,7 @@ GameObject:
   - component: {fileID: 765655847}
   - component: {fileID: 765655851}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Cards Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -639,7 +639,7 @@ MonoBehaviour:
   OnCardUsed:
     m_PersistentCalls:
       m_Calls: []
-  _isEnabled: 1
+  isEnabled: 0
   _handShowTime: 0.35
   _handHideTime: 0.35
   _cardSelectTime: 0.35
@@ -871,7 +871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1821984515}
   m_Layer: 5
-  m_Name: Goals
+  m_Name: Center Goal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

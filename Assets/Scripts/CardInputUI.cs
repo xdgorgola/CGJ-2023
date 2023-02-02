@@ -71,12 +71,12 @@ public class CardInputUI : MonoBehaviour
     }
 
 
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
             ReceiveCard(null);
     }
+
 
     public void ReceiveCard(GameCards card)
     {

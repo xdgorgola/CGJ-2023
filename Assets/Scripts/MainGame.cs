@@ -8,6 +8,9 @@ public class MainGame : MonoBehaviour
     private BoardComponent _board = null;
     [SerializeField]
     private PlantComponent _plant = null;
+    [SerializeField]
+    private CardInputUI _cardInput = null;
+
 
     private IEnumerator StartGame()
     {
