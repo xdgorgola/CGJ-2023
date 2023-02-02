@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class climatechanger : MonoBehaviour
+public class SeasonChanger : MonoBehaviour
 {
 
     public enum Season
@@ -17,9 +17,13 @@ public class climatechanger : MonoBehaviour
     public GameObject verano;
     public GameObject invierno;
     public GameObject otono;
-    public GameObject primavera;
+    public GameObject primavera;  
+    [SerializeField]
+    private int contador;
+    [SerializeField]
+    private int topeSeason;// para asegurar 12 turnos
 
-
+    //Variables de temporadas
     void climaVerano()
     {
         verano.SetActive(true);
@@ -52,61 +56,73 @@ public class climatechanger : MonoBehaviour
 
     }
 
-    public void Cambiador()
+    // Cambiador de temporada con contador incluido y retorna temporada como enum
+    public Season cambioTempo()
     {
+        contador++;
+        if (contador == topeSeason)
+        {
+            temporada++;
+            Cambiador();
+          
+            
+
+        }
+        return temporada;
+    }
+  
+    /// prueba de que funcione todo
+    public void EndTurn()
+    {
+        contador++;
+        if (contador == topeSeason)
+        {
+            temporada++;
+            Cambiador();
+        }
+    }
+    //ESTO ES PARA EL DROPDOWN
+    public void HandleInputData(int val)
+    {
+        temporada =(Season)val;
+        Cambiador();
+    }
+
+    //Funcion que cambia la tempo
+    private void Cambiador()
+    {
+        contador = 0;
         if (temporada == Season.spring)
         {
 
-            Debug.Log("caso1");
             climaPrimavera();
+
 
         }
         else if (temporada == Season.summer)
         {
 
             climaVerano();
-            Debug.Log("caso2");
+          
 
         }
         else if (temporada == Season.fall)
         {
             climaOtono();
-            Debug.Log("caso3");
+            
 
         }
         else if (temporada == Season.winter)
         {
             climaInvierno();
-            Debug.Log("caso4");
+           
 
 
         }
     }
 
-    public void HandleInputData(int val)
-    {
-        if (val == 0)
-        {
-            temporada = Season.spring;
-            Cambiador();
-        }
-        else if (val == 1)
-        {
-            temporada = Season.summer;
-            Cambiador();
-        }
-        else if (val == 2)
-        {
-            temporada = Season.fall;
-            Cambiador();
-        }
-        else if (val == 3)
-        {
-            temporada = Season.winter;
-            Cambiador();
-        }
-    }
+   
+
+   
 }
-
-
 
