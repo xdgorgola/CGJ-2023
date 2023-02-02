@@ -31,6 +31,7 @@ public class CardInputUI : MonoBehaviour
 
     // Data
     private List<GameCards> _cardHand = new List<GameCards>();
+    private Queue<int> _emptyCardsQ = new Queue<int>();
 
     // Events
     [SerializeField]
@@ -41,8 +42,7 @@ public class CardInputUI : MonoBehaviour
     private bool _focusing = false;
     private int _focusIndex = 0;
 
-    [SerializeField]
-    private bool _isEnabled = false;
+    public bool isEnabled = false;
 
     // Timing
     [SerializeField]
@@ -61,16 +61,54 @@ public class CardInputUI : MonoBehaviour
     private Coroutine _shrinkRoutine = null;
 
 
+    private void Start()
+    {
+        for (int i = 0; i < _uiCards.Count; ++i)
+        {
+            _emptyCardsQ.Enqueue(i);
+            _cardHand.Add(null);
+        }
+    }
+
+
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+            ReceiveCard(null);
+    }
+
     public void ReceiveCard(GameCards card)
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
+
+        int target = _emptyCardsQ.Dequeue();
+        _cardHand[target] = card;
+        StartCoroutine(PlaceCardOnHandRoutine(target));
+    }
+
+
+    private IEnumerator PlaceCardOnHandRoutine(int index)
+    {
+        RectTransform cont = _uiContainers[index];
+        RectTransform card = _uiCards[index];
+        RectTransform canv = (RectTransform)_canvas.transform;
+
+        card.position = cont.position + Vector3.right * (canv.sizeDelta.x * _canvas.scaleFactor + 50f);
+        yield return null;
+
+        Tween posTween = card.DOMove(cont.position, 0.6f).SetEase(Ease.OutBack, 0.5f);
+        Tween rotTween = card.DORotate(Vector3.zero, 0.01f);
+        Tween scaTween = card.DOScale(1f, 0.01f);
+        yield return new WaitUntil(() => 
+            posTween.IsComplete() && rotTween.IsComplete() && scaTween.IsComplete());
     }
 
 
     public void ClickCard(BaseEventData click)
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
 
         PointerEventData pointerData = (PointerEventData)click;
@@ -120,7 +158,7 @@ public class CardInputUI : MonoBehaviour
 
     private void UseCard(int index)
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
 
         _focusing = true;
@@ -131,6 +169,8 @@ public class CardInputUI : MonoBehaviour
             return;
 
         OnCardUsed.Invoke(_cardHand[index]);
+        _cardHand[index] = null;
+        _emptyCardsQ.Enqueue(index);
     }
 
 
@@ -140,13 +180,13 @@ public class CardInputUI : MonoBehaviour
         Tween scale = cardTransform.DOScale(0f, 0.5f);
         Tween rot = cardTransform.DORotate(new Vector3(0f, 0f, 80f), 0.5f);
 
-        yield return new WaitUntil(() => scale.IsComplete());
+        yield return new WaitUntil(() => scale.IsComplete() && rot.IsComplete());
     }
 
 
     public void EnlargeCard(int index)
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
 
         if (_enlargeRoutine != null)
@@ -168,7 +208,7 @@ public class CardInputUI : MonoBehaviour
 
     public void ReturnCard(int index)
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
 
         if (_shrinkRoutine != null)
@@ -190,7 +230,7 @@ public class CardInputUI : MonoBehaviour
 
     public void ShowCards()
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
 
         _showing = true;
@@ -203,7 +243,7 @@ public class CardInputUI : MonoBehaviour
 
     public void HideCards()
     {
-        if (!_isEnabled)
+        if (!isEnabled)
             return;
 
         _showing = false;
