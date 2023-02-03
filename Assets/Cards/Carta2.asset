@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfd5ad79789578a43ab34656aefc8953, type: 3}
   m_Name: Carta2
   m_EditorClassIdentifier: 
-  _name: CARD
-  _description: DEFAULT
-  _picture: {fileID: 0}
-  _effect: 0
+  _name: Parra
+  _description: 'Progamador Senior '
+  _picture: {fileID: 21300000, guid: 1a157aa67d8d0f14a969c19f192d3ffb, type: 3}
+  _effect: 12
   _params: []
