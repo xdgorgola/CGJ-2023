@@ -8,11 +8,14 @@ public enum CardEffects
     MoveHor,        // mov: nro casillas
     MoveVert,       // mov: nro casillas
     MoveDiag,       // mov: nro casillas
+    DivideRoot,     // no params
     QueueRain,      // wait: dias de cola - dur: duracion clima
     QueueCloudy,    // wait: dias de cola - dur: duracion clima
     QueueNeutral,   // wait: dias de cola - dur: duracion clima
     GainWater,      // quant: nro ganado
     GainNutrient,   // quant: nro ganado
+    GainLife,       // quant: nro ganado
+    BetterWaterAbs, // amount: porcentaje de aumento - dur: duracion en turnos
     DiscoverMap,    // num: nro casillas desbloqueadas
     BreakRock       // num: nro rocas descubiertas
 }  
