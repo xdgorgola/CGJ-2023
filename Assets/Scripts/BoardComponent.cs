@@ -103,7 +103,7 @@ public class BoardComponent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void InitBoard()
@@ -146,6 +146,17 @@ public class BoardComponent : MonoBehaviour
                 _board[(int)Layers.Visibility, i, j] = TileToType(visibilityTile);
             }
     }
+
+    private bool DestroyRock(Vector2 worldPosition)
+    {
+        return false;
+    }
+
+    private bool DiscoverCell(Vector2 worldPositon)
+    {
+        return false;
+    }
+
 
     private void SetUpTilemap()
     {
@@ -211,6 +222,25 @@ public class BoardComponent : MonoBehaviour
     }
 
     private Vector3Int BoardIndexToTilemapPosition(int i, int j) => new(j + _origin.x, -i + _origin.y, _origin.z);
+
+
+    /// <summary>
+    /// Transform from world position to matrix position
+    /// </summary>
+    /// <param name="worldPosition"> Position in world coordinates, z coordinate is not important </param>
+    /// <returns> null if outside of game matrix, (i,j) indices otherwise </returns>
+    private Vector2Int? WorldPosToBoardPosition(Vector2 worldPosition)
+    {
+        Vector3Int cellPosition = _origin - _playableTilemap.WorldToCell(worldPosition);
+        cellPosition.x *= -1; // PQC lol
+        if (0 <= cellPosition.x && cellPosition.x < _boardWidth && 0 <= cellPosition.y && cellPosition.y < _boardHeight)
+        {
+            return new Vector2Int(cellPosition.y, cellPosition.x);
+        }
+
+        return null;
+    }
+
 
     /// <summary>
     /// Synch tilemap to match state of board
