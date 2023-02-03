@@ -16,6 +16,8 @@ public class CardInputUI : MonoBehaviour
     private Canvas _canvas = null;
     [SerializeField]
     private GraphicRaycaster _raycaster = null;
+    [SerializeField]
+    private ChooseCardText _chooseText = null;
 
     // UI Elements
     [SerializeField]
@@ -41,8 +43,8 @@ public class CardInputUI : MonoBehaviour
     private bool _showing = false;
     private bool _focusing = false;
     private int _focusIndex = 0;
-
-    public bool isEnabled = false;
+    [SerializeField]
+    private bool _isEnabled = false;
 
     // Timing
     [SerializeField]
@@ -71,16 +73,26 @@ public class CardInputUI : MonoBehaviour
     }
 
 
-    private void Update()
+    public int MissingCardCount() =>
+        _emptyCardsQ.Count;
+
+
+    public void EnableSystem()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-            ReceiveCard(null);
+        _isEnabled = true;
+        _chooseText.DisplayText();
+    }
+
+
+    public void DisableSystem()
+    {
+        _isEnabled = false;
     }
 
 
     public void ReceiveCard(GameCards card)
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
         int target = _emptyCardsQ.Dequeue();
@@ -98,17 +110,18 @@ public class CardInputUI : MonoBehaviour
         card.position = cont.position + Vector3.right * (canv.sizeDelta.x * _canvas.scaleFactor + 50f);
         yield return null;
 
-        Tween posTween = card.DOMove(cont.position, 0.6f).SetEase(Ease.OutBack, 0.5f);
-        Tween rotTween = card.DORotate(Vector3.zero, 0.01f);
-        Tween scaTween = card.DOScale(1f, 0.01f);
-        yield return new WaitUntil(() => 
-            posTween.IsComplete() && rotTween.IsComplete() && scaTween.IsComplete());
+        Sequence seq = DOTween.Sequence();
+        seq.Append(card.DOMove(cont.position, 0.6f).SetEase(Ease.OutBack, 0.5f));
+        seq.Join(card.DORotate(Vector3.zero, 0.01f));
+        seq.Join(card.DOScale(1f, 0.01f));
+
+        yield return seq.WaitForCompletion();
     }
 
 
     public void ClickCard(BaseEventData click)
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
         PointerEventData pointerData = (PointerEventData)click;
@@ -158,10 +171,10 @@ public class CardInputUI : MonoBehaviour
 
     private void UseCard(int index)
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
-        _focusing = true;
+        _focusing = false;
         _focusIndex = index;
         StartCoroutine(ConsumeCardRoutine(index));
 
@@ -177,16 +190,18 @@ public class CardInputUI : MonoBehaviour
     private IEnumerator ConsumeCardRoutine(int index)
     {
         RectTransform cardTransform = _uiCards[index];
-        Tween scale = cardTransform.DOScale(0f, 0.5f);
-        Tween rot = cardTransform.DORotate(new Vector3(0f, 0f, 80f), 0.5f);
 
-        yield return new WaitUntil(() => scale.IsComplete() && rot.IsComplete());
+        Sequence seq = DOTween.Sequence();
+        seq.Append(cardTransform.DOScale(0f, 0.5f));
+        seq.Join(cardTransform.DORotate(new Vector3(0f, 0f, 80f), 0.5f));
+
+        yield return seq.WaitForCompletion();
     }
 
 
     public void EnlargeCard(int index)
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
         if (_enlargeRoutine != null)
@@ -199,16 +214,18 @@ public class CardInputUI : MonoBehaviour
     private IEnumerator EnlargeCardRoutine(int index)
     {
         RectTransform cardTransform = _uiCards[index];
-        Tween center = cardTransform.DOMove(_centerGoal.position, _cardSelectTime, false);
-        Tween scale = cardTransform.DOScale(2f, _cardSelectTime);
 
-        yield return new WaitUntil(() => center.IsComplete() && scale.IsComplete());
+        Sequence seq = DOTween.Sequence();
+        seq.Append(cardTransform.DOMove(_centerGoal.position, _cardSelectTime, false));
+        seq.Join(cardTransform.DOScale(2f, _cardSelectTime));
+
+        yield return seq.WaitForCompletion();
     }
 
 
     public void ReturnCard(int index)
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
         if (_shrinkRoutine != null)
@@ -221,16 +238,18 @@ public class CardInputUI : MonoBehaviour
     private IEnumerator ReturnCardRoutine(int index)
     {
         RectTransform cardTransform = _uiCards[index];
-        Tween position = cardTransform.DOMove(_uiContainers[index].position, _cardSelectTime, false);
-        Tween scale = cardTransform.DOScale(1f, _cardSelectTime);
 
-        yield return new WaitUntil(() => position.IsComplete() && scale.IsComplete());
+        Sequence seq = DOTween.Sequence();
+        seq.Append(cardTransform.DOMove(_uiContainers[index].position, _cardSelectTime, false));
+        seq.Join(cardTransform.DOScale(1f, _cardSelectTime));
+
+        yield return seq.WaitForCompletion();
     }
 
 
     public void ShowCards()
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
         _showing = true;
@@ -243,7 +262,7 @@ public class CardInputUI : MonoBehaviour
 
     public void HideCards()
     {
-        if (!isEnabled)
+        if (!_isEnabled)
             return;
 
         _showing = false;
