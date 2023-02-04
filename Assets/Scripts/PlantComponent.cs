@@ -15,7 +15,10 @@ public class PlantComponent : MonoBehaviour
     [SerializeField] private int baseTurnosHojas; //4
     [SerializeField] private float baseRatioAbsorcionAgua;//1
     [SerializeField] private float baseRatioAbsorcionNutrientes;//1
-    [SerializeField] private Leaf[] hojas;
+    [SerializeField] private int baseConsumoAguaXTurno; //1
+    [SerializeField] private int baseConsumoNutrienteXTurno; //1
+    [SerializeField] private LeafComponent[] hojas;
+    [SerializeField] private List<WaterGainUpgrade> absorcionAgua; //ESTAS SON MEJORAS TEMPORALES
 
     //VALORES MAXIMOS
     [SerializeField] private int maxAgua;
@@ -26,6 +29,8 @@ public class PlantComponent : MonoBehaviour
     [SerializeField] private int agua;
     [SerializeField] private int nutrientes;
     [SerializeField] private int turnosHojas;
+    [SerializeField] private int consumoAguaXTurno;
+    [SerializeField] private int consumoNutrienteXTurno;
 
     //Events
     [SerializeField] private UnityEvent OnFlowerDeath = new UnityEvent();
@@ -72,19 +77,24 @@ public class PlantComponent : MonoBehaviour
         CardEffects effect = card.CardEffect;
         switch (effect)
         {
-            case CardEffects.GainWater:
-                ChangeWaterCount(card.GetParams()["quant"]);
+            case CardEffects.GainWater: //GANANCIA DE AGUA FIJA POR CARTA
                 ChangeWaterCount(card.WaterCost);
+                ChangeWaterCount(card.GetParams()["quant"]); 
                 return;
 
-            case CardEffects.GainNutrient:
+            case CardEffects.GainNutrient://GANANCIA DE NUTRIENTES FIJA POR CARTA
+                ChangeWaterCount(card.WaterCost);
                 UpdateNutrients(card.GetParams()["quant"]);
-                ChangeWaterCount(card.WaterCost);
                 return;
-            case CardEffects.BetterWaterAbs:
+
+            case CardEffects.BetterWaterAbs://MEJORA DE ABSORCIÓN DE AGUA POR CARTA
                 ChangeWaterCount(card.WaterCost);
+                WaterGainUpgrade nuevaMejora = new WaterGainUpgrade();
+                nuevaMejora.MaxTurnos = (int)card.GetParams()["quant"];
+                absorcionAgua.Add(nuevaMejora);
                 return;
-            case CardEffects.GainLeaf:
+
+            case CardEffects.GainLeaf://GENERACIÓN DE UNA HOJA POR CARTA
                 ChangeWaterCount(card.WaterCost);
                 addLeaf();
                 return;
@@ -96,6 +106,7 @@ public class PlantComponent : MonoBehaviour
     {
         resetStats();
         resetLeafs();
+        resetWaterUpgrades();
     }
 
     //Restart only the stats
@@ -107,16 +118,24 @@ public class PlantComponent : MonoBehaviour
         maxNutrientes = baseMaxNutrientes;
         ratioAbsorcionAgua = baseRatioAbsorcionAgua;
         turnosHojas = baseTurnosHojas;
+        consumoNutrienteXTurno = baseConsumoNutrienteXTurno;
+        consumoAguaXTurno = baseConsumoAguaXTurno;
     }
 
     private void resetLeafs()
     {
-        hojas = new Leaf[baseMaxNumHojas];
+        hojas = new LeafComponent[baseMaxNumHojas];
 
         for(int i = 0; i < baseMaxNumHojas; i++)
         {
-            hojas[i] = new Leaf();
+            hojas[i] = new LeafComponent();
         }
+    }
+
+    private void resetWaterUpgrades()
+    {
+       absorcionAgua.Clear();
+       // SI es necesario agregar otra función para eliminar mejoras de agua
     }
 
     private void addLeaf()
@@ -162,25 +181,44 @@ public class PlantComponent : MonoBehaviour
             }
 
         }
+        int j = 0;
+
+        //Le hacemos tic a la mejoras temporales de absorción de agua
+        while (j<absorcionAgua.Count)
+        {
+            if(absorcionAgua[j].MaxTurnos <= absorcionAgua[j].Turnos)
+            {
+                absorcionAgua.RemoveAt(j);
+            }
+            else
+            {
+                absorcionAgua[j].addCount();
+                j++;
+            }
+        }
+
+        //Le haceos Tic al agua y Nutrientes
+        ChangeWaterCount(-1 * consumoAguaXTurno);
+        UpdateNutrients(-1 * consumoNutrienteXTurno);
     }
 }
 
-public class Leaf
+//Clase Auxiliar para definir mejoras temporales a la ganancia de agua
+public class WaterGainUpgrade
 {
-
-    private int turnos = 0;
-    private bool isActive = false;
+    [SerializeField] private int turnos = 0;
+    [SerializeField] private int maxTurnos = 4;
 
     public int Turnos
     {
         get { return turnos; }
-        set{ turnos = value; }
+        set { turnos = value; }
     }
 
-    public bool IsActive
+    public int MaxTurnos
     {
-        get { return isActive; }
-        set { isActive = value; }
+        get { return maxTurnos; }
+        set { maxTurnos = value; }
     }
 
     public void addCount()
