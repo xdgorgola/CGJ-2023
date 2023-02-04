@@ -48,5 +48,7 @@ public class WeatherMgr : MonoBehaviour
             case Season.Winter:
                 break;
         }
+
+        return 0;
     }
 }

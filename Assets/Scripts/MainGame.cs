@@ -17,10 +17,16 @@ public class MainGame : MonoBehaviour
     private DeckScript _deck = null;
     [SerializeField]
     private SeasonChanger _seasonMng = null;
+    [SerializeField]
+    private WeatherMgr _weatherMng = null;
 
     [SerializeField]
     private Season _startingSeason = Season.Spring;
     private GameCards _oldCard = null;
+
+    private bool _usedCard = false;
+    private bool _successCard = false;
+    private bool _failedCard = false;
 
 
     private void Awake()
@@ -51,8 +57,10 @@ public class MainGame : MonoBehaviour
     private IEnumerator DoGameRound()
     {
         Season season = _seasonMng.TickSeason();
+        Weather weather = _weatherMng.Tick(season);
 
         RequestCardsForDeck();
+        
         yield return new WaitForSeconds(1f);
 
         _cardInput.EnableSystem();

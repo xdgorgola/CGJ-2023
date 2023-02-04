@@ -48,6 +48,9 @@ public class GameCards : ScriptableObject
     private string _description = "DEFAULT";
     [SerializeField]
     private Sprite _picture = null;
+    [Min(0)]
+    [SerializeField]
+    private int _waterCost = 0;
 
     [SerializeField]
     private CardEffects _effect;
@@ -73,6 +76,11 @@ public class GameCards : ScriptableObject
     public CardEffects CardEffect
     {
         get { return _effect; }
+    }
+
+    public int WaterCost
+    {
+        get { return _waterCost; }
     }
 
 

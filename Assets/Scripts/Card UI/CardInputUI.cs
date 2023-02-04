@@ -73,6 +73,25 @@ public class CardInputUI : MonoBehaviour
     }
 
 
+    private void Update()
+    {
+        if (!_isEnabled)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Space) && !_focusing)
+        {
+            if (!_showing)
+            {
+                ShowCards();
+                return;
+            }
+
+            HideCards();
+            return;
+        }
+    }
+
+
     public int MissingCardCount() =>
         _emptyCardsQ.Count;
 
@@ -86,42 +105,16 @@ public class CardInputUI : MonoBehaviour
 
     public void DisableSystem()
     {
+        if (_showing)
+            HideCards();
+
         _isEnabled = false;
-    }
-
-
-    public void ReceiveCard(GameCards card)
-    {
-        if (!_isEnabled)
-            return;
-
-        int target = _emptyCardsQ.Dequeue();
-        _cardHand[target] = card;
-        StartCoroutine(PlaceCardOnHandRoutine(target));
-    }
-
-
-    private IEnumerator PlaceCardOnHandRoutine(int index)
-    {
-        RectTransform cont = _uiContainers[index];
-        RectTransform card = _uiCards[index];
-        RectTransform canv = (RectTransform)_canvas.transform;
-
-        card.position = cont.position + Vector3.right * (canv.sizeDelta.x * _canvas.scaleFactor + 50f);
-        yield return null;
-
-        Sequence seq = DOTween.Sequence();
-        seq.Append(card.DOMove(cont.position, 0.6f).SetEase(Ease.OutBack, 0.5f));
-        seq.Join(card.DORotate(Vector3.zero, 0.01f));
-        seq.Join(card.DOScale(1f, 0.01f));
-
-        yield return seq.WaitForCompletion();
     }
 
 
     public void ClickCard(BaseEventData click)
     {
-        if (!_isEnabled)
+        if (!_isEnabled || !_showing)
             return;
 
         PointerEventData pointerData = (PointerEventData)click;
@@ -150,6 +143,49 @@ public class CardInputUI : MonoBehaviour
             default:
                 return;
         }
+    }
+
+
+    public void DiscardHand()
+    {
+        for (int i = 0; i < _uiCards.Count; ++i)
+        {
+            if (_cardHand[i] == null)
+                continue;
+
+            StartCoroutine(ConsumeCardRoutine(i));
+            _cardHand[i] = null;
+        }
+    }
+
+
+    public void ReceiveCard(GameCards card)
+    {
+        if (!_isEnabled)
+            return;
+
+        int target = _emptyCardsQ.Dequeue();
+        _cardHand[target] = card;
+        StartCoroutine(PlaceCardOnHandRoutine(target));
+    }
+
+
+    private IEnumerator PlaceCardOnHandRoutine(int index)
+    {
+        RectTransform cont = _uiContainers[index];
+        RectTransform card = _uiCards[index];
+        RectTransform canv = (RectTransform)_canvas.transform;
+
+        card.localScale = Vector3.one;  // Just in case it was consumed
+        card.position = cont.position + Vector3.right * (canv.sizeDelta.x * _canvas.scaleFactor + 50f);
+        yield return null;
+
+        Sequence seq = DOTween.Sequence();
+        seq.Append(card.DOMove(cont.position, 0.6f).SetEase(Ease.OutBack, 0.5f));
+        seq.Join(card.DORotate(Vector3.zero, 0.01f));
+        seq.Join(card.DOScale(1f, 0.01f));
+
+        yield return seq.WaitForCompletion();
     }
 
 
