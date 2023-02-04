@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(Animator))]
 public class PlantComponent : MonoBehaviour
 {
+    //Componentes
+    private Animator _animator = null;
 
     //VALORES BASE
-    [SerializeField] private int baseAgua; //75
-    [SerializeField] private int baseNutrientes; //0
-    [SerializeField] private int baseMaxAgua;//100
-    [SerializeField] private int baseMaxNutrientes;//50
-    [SerializeField] private int baseMaxNumHojas;//4
-    [SerializeField] private int baseTurnosHojas; //4
-    [SerializeField] private float baseRatioAbsorcionAgua;//1
-    [SerializeField] private float baseRatioAbsorcionNutrientes;//1
-    [SerializeField] private int baseConsumoAguaXTurno; //1
-    [SerializeField] private int baseConsumoNutrienteXTurno; //1
+    [SerializeField] private int baseAgua = 75; //75
+    [SerializeField] private int baseNutrientes = 0; //0
+    [SerializeField] private int baseMaxAgua = 100;//100
+    [SerializeField] private int baseMaxNutrientes = 50;//50
+    [SerializeField] private int baseMaxNumHojas = 4;//4
+    [SerializeField] private int baseTurnosHojas = 4; //4
+    [SerializeField] private float baseRatioAbsorcionAgua = 1f;//1
+    [SerializeField] private float baseRatioAbsorcionNutrientes = 1f;//1
+    [SerializeField] private int baseConsumoAguaXTurno = 1; //1
+    [SerializeField] private int baseConsumoNutrienteXTurno = 1; //1
     [SerializeField] private LeafComponent[] hojas;
     [SerializeField] private List<WaterGainUpgrade> absorcionAgua; //ESTAS SON MEJORAS TEMPORALES
 
@@ -36,11 +39,12 @@ public class PlantComponent : MonoBehaviour
     [SerializeField] private UnityEvent OnFlowerDeath = new UnityEvent();
     [SerializeField] private UnityEvent OnNutrientsCap = new UnityEvent();
 
-    // Start is called before the first frame update
-    void Start()
+
+    private void Awake()
     {
-        resetPlant();
+        _animator = GetComponent<Animator>();
     }
+
 
     public void ChangeWaterCount(float cost)
     {
@@ -51,7 +55,10 @@ public class PlantComponent : MonoBehaviour
         }
         else if (newWater == 0)
         {
-            OnFlowerDeath.Invoke();
+            if (OnFlowerDeath != null)
+                OnFlowerDeath.Invoke();
+
+            _animator.SetTrigger("Die");
         }
 
     }
@@ -101,13 +108,16 @@ public class PlantComponent : MonoBehaviour
         }
     }
 
+
     //Restart All the plant
     public void resetPlant()
     {
+        _animator.SetTrigger("Revive");
         resetStats();
         resetLeafs();
-        resetWaterUpgrades();
+        //resetWaterUpgrades();
     }
+
 
     //Restart only the stats
     private void resetStats()
@@ -122,6 +132,7 @@ public class PlantComponent : MonoBehaviour
         consumoAguaXTurno = baseConsumoAguaXTurno;
     }
 
+
     private void resetLeafs()
     {
         for(int i = 0; i < hojas.Length; i++)
@@ -131,11 +142,13 @@ public class PlantComponent : MonoBehaviour
         }
     }
 
+
     private void resetWaterUpgrades()
     {
        absorcionAgua.Clear();
        // SI es necesario agregar otra función para eliminar mejoras de agua
     }
+
 
     private void addLeaf()
     {

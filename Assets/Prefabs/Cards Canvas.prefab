@@ -237,6 +237,7 @@ MonoBehaviour:
   _handShowTime: 0.35
   _handHideTime: 0.35
   _cardSelectTime: 0.35
+  testCard: {fileID: 0}
 --- !u!1 &4908981611519126549
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,6 +426,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4908981612111090294}
     m_Modifications:
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6526213340572963956, guid: a8999888ce2d14f4588e66a00e4464ad,
         type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -566,6 +582,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4908981612111090294}
     m_Modifications:
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6526213340572963956, guid: a8999888ce2d14f4588e66a00e4464ad,
         type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -707,6 +738,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4908981612111090294}
     m_Modifications:
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6526213340572963956, guid: a8999888ce2d14f4588e66a00e4464ad,
         type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -848,6 +894,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4908981612111090294}
     m_Modifications:
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6526213340572963956, guid: a8999888ce2d14f4588e66a00e4464ad,
         type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -989,6 +1050,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4908981612111090294}
     m_Modifications:
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2074259389132530943, guid: a8999888ce2d14f4588e66a00e4464ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6526213340572963956, guid: a8999888ce2d14f4588e66a00e4464ad,
         type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
