@@ -6,20 +6,26 @@ using UnityEngine.Events;
 public class PlantComponent : MonoBehaviour
 {
 
-    //VALORES MAXIMOS
-    [SerializeField] private float maxAgua;
-    [SerializeField] private float maxNutrientes;
-    [SerializeField] private float maxVida;
-
     //VALORES BASE
-    [SerializeField] private float baseAgua;
-    [SerializeField] private float baseNutrientes;
-    [SerializeField] private float baseVida;
+    [SerializeField] private int baseAgua; //75
+    [SerializeField] private int baseNutrientes; //0
+    [SerializeField] private int baseMaxAgua;//100
+    [SerializeField] private int baseMaxNutrientes;//50
+    [SerializeField] private int baseMaxNumHojas;//4
+    [SerializeField] private int baseTurnosHojas; //4
+    [SerializeField] private float baseRatioAbsorcionAgua;//1
+    [SerializeField] private float baseRatioAbsorcionNutrientes;//1
+    [SerializeField] private Leaf[] hojas;
 
-    //VALORES ACTUALES
-    [SerializeField] private float agua;
-    [SerializeField] private float nutrientes;
-    [SerializeField] private float vida;
+    //VALORES MAXIMOS
+    [SerializeField] private int maxAgua;
+    [SerializeField] private int maxNutrientes;
+    [SerializeField] private float ratioAbsorcionAgua;
+    [SerializeField] private float ratioAbsorcionNutrientes;
+    //VALORES ACTUALES      
+    [SerializeField] private int agua;
+    [SerializeField] private int nutrientes;
+    [SerializeField] private int turnosHojas;
 
     //Events
     [SerializeField] private UnityEvent OnFlowerDeath = new UnityEvent();
@@ -33,22 +39,12 @@ public class PlantComponent : MonoBehaviour
 
     public void ChangeWaterCount(float cost)
     {
-        float newWater = Mathf.Clamp(vida + cost, 0, maxAgua);
+        float newWater = Mathf.Clamp(agua + cost, 0, maxAgua);
         if (newWater < maxAgua && newWater > 0)
         {
-            agua = newWater;
+            agua = (int)newWater;
         }
-
-    }
-
-    public void UpdateLife(float cost)
-    {
-        float newLife = Mathf.Clamp(vida + cost, 0, maxVida);
-        if (newLife < maxVida && newLife > 0)
-        {
-            vida = newLife;
-        }
-        else if (newLife == 0)
+        else if (newWater == 0)
         {
             OnFlowerDeath.Invoke();
         }
@@ -60,13 +56,13 @@ public class PlantComponent : MonoBehaviour
         float newNutrients = Mathf.Clamp(nutrientes + cost, 0, maxNutrientes);
         if (newNutrients < maxNutrientes && newNutrients > 0)
         {
-            nutrientes = newNutrients;
+            nutrientes = (int)newNutrients;
         }
         else if (newNutrients == maxNutrientes)
         {
             //TRIGGER PARA CONSEGUIR MEJORA
             OnNutrientsCap.Invoke();
-            nutrientes = 0f;
+            nutrientes = 0;
         }
 
     }
@@ -78,13 +74,20 @@ public class PlantComponent : MonoBehaviour
         {
             case CardEffects.GainWater:
                 ChangeWaterCount(card.GetParams()["quant"]);
+                ChangeWaterCount(card.WaterCost);
                 return;
 
             case CardEffects.GainNutrient:
                 UpdateNutrients(card.GetParams()["quant"]);
-                ChangeWaterCount(-1);
+                ChangeWaterCount(card.WaterCost);
                 return;
-
+            case CardEffects.BetterWaterAbs:
+                ChangeWaterCount(card.WaterCost);
+                return;
+            case CardEffects.GainLeaf:
+                ChangeWaterCount(card.WaterCost);
+                addLeaf();
+                return;
         }
     }
 
@@ -92,6 +95,7 @@ public class PlantComponent : MonoBehaviour
     public void resetPlant()
     {
         resetStats();
+        resetLeafs();
     }
 
     //Restart only the stats
@@ -99,6 +103,88 @@ public class PlantComponent : MonoBehaviour
     {
         agua = baseAgua;
         nutrientes = baseNutrientes;
-        vida = baseVida;
+        maxAgua = baseMaxAgua;
+        maxNutrientes = baseMaxNutrientes;
+        ratioAbsorcionAgua = baseRatioAbsorcionAgua;
+        turnosHojas = baseTurnosHojas;
+    }
+
+    private void resetLeafs()
+    {
+        hojas = new Leaf[baseMaxNumHojas];
+
+        for(int i = 0; i < baseMaxNumHojas; i++)
+        {
+            hojas[i] = new Leaf();
+        }
+    }
+
+    private void addLeaf()
+    {
+        int maxTurns = 0;
+        int pos = 0;
+
+        for(int i = 0; i <baseMaxNumHojas; i++)
+        {
+            if (!hojas[i].IsActive)
+            {
+                hojas[i].IsActive = true;
+                hojas[i].Turnos = 0;
+                return;
+            }
+            else
+            {
+                if (hojas[i].Turnos>=maxTurns)
+                {
+                    maxTurns = hojas[i].Turnos;
+                    pos = i;
+                }
+            }
+        }
+
+        hojas[pos].Turnos = 0;
+    }
+
+    public void Tick()
+    {   
+
+        //Le Hacemos TICK a las hojas
+        for (int i = 0; i < baseMaxNumHojas; i++)
+        {
+            if (hojas[i].IsActive)
+            {
+                if (hojas[i].Turnos == turnosHojas)
+                {
+                    hojas[i].IsActive = false;
+                }
+                hojas[i].addCount();
+                return;
+            }
+
+        }
+    }
+}
+
+public class Leaf
+{
+
+    private int turnos = 0;
+    private bool isActive = false;
+
+    public int Turnos
+    {
+        get { return turnos; }
+        set{ turnos = value; }
+    }
+
+    public bool IsActive
+    {
+        get { return isActive; }
+        set { isActive = value; }
+    }
+
+    public void addCount()
+    {
+        turnos = turnos + 1;
     }
 }
