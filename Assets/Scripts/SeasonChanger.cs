@@ -14,7 +14,9 @@ public enum Season
 public class SeasonChanger : MonoBehaviour
 {
     private const int SEASON_COUNT = 4;
-
+    private List<SpriteRenderer> currentSeason = new List<SpriteRenderer>();
+    private List<SpriteRenderer> nextSeason = new List<SpriteRenderer>();
+    
     private Season temporada;
     public List<SpriteRenderer> spritesVerano = new List<SpriteRenderer>();
     ///public GameObject verano;
@@ -34,45 +36,6 @@ public class SeasonChanger : MonoBehaviour
     [SerializeField]
     private int topeSeason = 12;// para asegurar 12 turnos
 
-
-    //Variables de temporadas
-  /*  private void TemporadaVerano()
-    {
-        verano.SetActive(true);
-        invierno.SetActive(false);
-        otono.SetActive(false);
-        primavera.SetActive(false);
-    }
-
-
-    private void TemporadaInvierno()
-    {
-        verano.SetActive(false);
-        invierno.SetActive(true);
-        otono.SetActive(false);
-        primavera.SetActive(false);
-    }
-
-
-    private void TemporadaOtono()
-    {
-        verano.SetActive(false);
-        invierno.SetActive(false);
-        otono.SetActive(true);
-        primavera.SetActive(false);
-    }
-
-
-    private void TemporadaPrimavera()
-    {
-        verano.SetActive(false);
-        invierno.SetActive(false);
-        otono.SetActive(false);
-        primavera.SetActive(true);
-    }
-  */
-
-    // Cambiador de temporada con contador incluido y retorna temporada como enum
     public Season TickSeason()
     {
         contador++;
@@ -92,12 +55,7 @@ public class SeasonChanger : MonoBehaviour
         Cambiador();
     }
 
-    public void prueba()
-    {
-        Debug.Log("boton presionado");
-        temporada = temporada++;
-        Cambiador();
-    }
+  
 
     //Funcion que cambia la tempo
     private void Cambiador()
@@ -106,49 +64,65 @@ public class SeasonChanger : MonoBehaviour
         switch (temporada)
         {
             case Season.Spring:
-                StartCoroutine(Fadetotemp(spriteInvierno,spritePrimavera));
+                currentSeason = spritePrimavera;
+                nextSeason = spritesVerano; 
+                StartCoroutine(Fadetotemp(currentSeason,nextSeason));
                 return;
             case Season.Summer:
-                StartCoroutine(Fadetotemp(spritePrimavera, spritesVerano));
+                currentSeason = spritesVerano;
+                nextSeason = spriteOtono;
+                StartCoroutine(Fadetotemp(currentSeason, nextSeason));
                 return;
             case Season.Fall:
-                StartCoroutine(Fadetotemp(spritesVerano, spriteOtono));
+                currentSeason = spriteOtono;
+                nextSeason = spriteInvierno;
+                StartCoroutine(Fadetotemp(currentSeason, nextSeason));
                 return;
             case Season.Winter:
-                StartCoroutine(Fadetotemp(spriteOtono, spriteInvierno));
+                currentSeason = spriteInvierno;
+                nextSeason = spritePrimavera;
+                StartCoroutine(Fadetotemp(currentSeason, nextSeason));
                 return;
+            
         }
     }
 
     
 
-    private IEnumerator Fadetotemp(List<SpriteRenderer>pepito,List<SpriteRenderer>pepito2)
+    private IEnumerator Fadetotemp(List<SpriteRenderer>actualSeason,List<SpriteRenderer>nextSeason)
     {
         
-        for (int f = 0; f < pepito.Count; f++)
+        for (int f = 0; f < actualSeason.Count; f++)
         {
-            while (pepito[f].color.a > 0f)
+            while (actualSeason[f].color.a > 0f)
             {
-                float fadeAmount = Mathf.Clamp(pepito[f].color.a - (FadeSpeed * Time.deltaTime), 0, 1);
-                Color objectColor = new Color(pepito[f].color.r, pepito[f].color.g, pepito[f].color.b, fadeAmount);
-                pepito[f].color = objectColor;
+                float fadeAmount = Mathf.Clamp(actualSeason[f].color.a - (FadeSpeed * Time.deltaTime), 0, 1);
+                Color objectColor = new Color(actualSeason[f].color.r, actualSeason[f].color.g, actualSeason[f].color.b, fadeAmount);
+                actualSeason[f].color = objectColor;
 
             }
-     
-            for (int k = 0; k < pepito2.Count; k++)
+
+            for (int k = 0; k < nextSeason.Count; k++)
             {
-                while (pepito2[k].color.a < 1)
+                while (nextSeason[k].color.a < 1)
                 {
-                  
-                    float fadeAmountV = Mathf.Clamp(pepito2[k].color.a + (FadeSpeed * Time.deltaTime), 0, 1);
+
+                    float fadeAmountV = Mathf.Clamp(nextSeason[k].color.a + (FadeSpeed * Time.deltaTime), 0, 1);
 
 
-                    Color objectVerano = new Color(pepito2[k].color.r, pepito2[k].color.g, pepito2[k].color.b, fadeAmountV);
-                    pepito2[k].color = objectVerano;
+                    Color objectVerano = new Color(nextSeason[k].color.r, nextSeason[k].color.g, nextSeason[k].color.b, fadeAmountV);
+                    nextSeason[k].color = objectVerano;
 
                 }
+            }
+                currentSeason = nextSeason;
+                nextSeason = null;
+                if(currentSeason == actualSeason && nextSeason == null)
+                {
+                    yield break;
+                }
                 yield return null;
-            }   
+              
         }
     }
 }
