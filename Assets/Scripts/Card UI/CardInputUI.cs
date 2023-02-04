@@ -63,6 +63,8 @@ public class CardInputUI : MonoBehaviour
     private Coroutine _shrinkRoutine = null;
 
 
+    public GameCards testCard;
+
     private void Start()
     {
         for (int i = 0; i < _uiCards.Count; ++i)
@@ -75,6 +77,9 @@ public class CardInputUI : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.E))
+            ReceiveCard(testCard);
+
         if (!_isEnabled)
             return;
 
@@ -161,9 +166,6 @@ public class CardInputUI : MonoBehaviour
 
     public void ReceiveCard(GameCards card)
     {
-        if (!_isEnabled)
-            return;
-
         int target = _emptyCardsQ.Dequeue();
         _cardHand[target] = card;
         StartCoroutine(PlaceCardOnHandRoutine(target));
@@ -176,6 +178,7 @@ public class CardInputUI : MonoBehaviour
         RectTransform card = _uiCards[index];
         RectTransform canv = (RectTransform)_canvas.transform;
 
+        card.GetComponent<CardUIElements>().SetCardInfo(_cardHand[index]);
         card.localScale = Vector3.one;  // Just in case it was consumed
         card.position = cont.position + Vector3.right * (canv.sizeDelta.x * _canvas.scaleFactor + 50f);
         yield return null;
@@ -191,17 +194,17 @@ public class CardInputUI : MonoBehaviour
 
     private void UnfocusCard()
     {
-        _focusing = false;
         ReturnCard(_focusIndex);
+        _focusing = false;
         _focusIndex = -1;
     }
 
 
     private void FocusCard(int index)
     {
-        _focusing = true;
         _focusIndex = index;
         EnlargeCard(index);
+        _focusing = true;
     }
 
 
@@ -237,7 +240,7 @@ public class CardInputUI : MonoBehaviour
 
     public void EnlargeCard(int index)
     {
-        if (!_isEnabled)
+        if (!_isEnabled || _focusing)
             return;
 
         if (_enlargeRoutine != null)
@@ -261,7 +264,7 @@ public class CardInputUI : MonoBehaviour
 
     public void ReturnCard(int index)
     {
-        if (!_isEnabled)
+        if (!_isEnabled && !_focusing)
             return;
 
         if (_shrinkRoutine != null)
@@ -285,12 +288,13 @@ public class CardInputUI : MonoBehaviour
 
     public void ShowCards()
     {
-        if (!_isEnabled)
+        if (!_isEnabled || _showing)
             return;
 
         _showing = true;
         if (_hideTween is not null && _hideTween.IsPlaying())
                 _hideTween.Kill();
+
 
         _showTween = _handTransform.DOMoveY(0f, _handShowTime, true).SetEase(Ease.OutBack);
     }
@@ -298,7 +302,7 @@ public class CardInputUI : MonoBehaviour
 
     public void HideCards()
     {
-        if (!_isEnabled)
+        if (!_showing)
             return;
 
         _showing = false;
@@ -307,5 +311,17 @@ public class CardInputUI : MonoBehaviour
 
         _hideTween = _handTransform.DOMoveY(_handTransform.sizeDelta.y * -0.8f * _canvas.scaleFactor, _handHideTime, true)
                     .SetEase(Ease.OutBack);
+    }
+
+
+    public void ListenOnCardUsed(UnityAction<GameCards> listener)
+    {
+        OnCardUsed.AddListener(listener);
+    }
+
+
+    public void RemoveOnCardUsed(UnityAction<GameCards> listener)
+    {
+        OnCardUsed.RemoveListener(listener);
     }
 }
