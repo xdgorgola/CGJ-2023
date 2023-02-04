@@ -226,10 +226,10 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1139847237}
+      - m_Target: {fileID: 1139847240}
         m_TargetAssemblyTypeName: SeasonChanger, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 0
+        m_MethodName: prueba
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -351,7 +351,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: cee28f56f629adf4a87aa87bf365eeba, type: 3}
-  m_Color: {r: 0.5633678, g: 0.58648354, b: 0.7075472, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -435,7 +435,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 332480a0d0ad8954fb3996708ec5c9cd, type: 3}
-  m_Color: {r: 0.5633678, g: 0.58648354, b: 0.7075472, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -656,7 +656,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 283d2151728458544b32f841a82733c8, type: 3}
-  m_Color: {r: 0.39607847, g: 0.52156866, b: 0.7058824, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -742,7 +742,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 8374af436394307468b4a946ad81c062, type: 3}
-  m_Color: {r: 0.5633678, g: 0.58648354, b: 0.7075472, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1250,7 +1250,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 283d2151728458544b32f841a82733c8, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1276,7 +1276,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &817686367
 Transform:
   m_ObjectHideFlags: 0
@@ -1339,7 +1339,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 4e7c76cb49eced9468d2c6fc4f4d871b, type: 3}
-  m_Color: {r: 0.5983624, g: 0.6835927, b: 0.8301887, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1460,7 +1460,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 7e6bf83704314454c94d6efb706a871e, type: 3}
-  m_Color: {r: 0.3137255, g: 0.49411768, b: 0.6666667, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1775,9 +1775,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1262197680}
-  - {fileID: 1350722290}
-  - {fileID: 817686367}
   - {fileID: 1487862928}
+  - {fileID: 817686367}
+  - {fileID: 1350722290}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1793,10 +1793,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64cce6373ea272248a42f976661f3596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verano: {fileID: 1350722289}
-  invierno: {fileID: 1487862927}
-  otono: {fileID: 817686366}
-  primavera: {fileID: 1262197679}
+  spritesVerano:
+  - {fileID: 1350722291}
+  - {fileID: 1486230133}
+  - {fileID: 1803978579}
+  spriteInvierno:
+  - {fileID: 1487862929}
+  - {fileID: 796675587}
+  - {fileID: 1623945709}
+  - {fileID: 1325085831}
+  - {fileID: 1198922341}
+  - {fileID: 1663404986}
+  spriteOtono:
+  - {fileID: 817686368}
+  - {fileID: 308498409}
+  - {fileID: 1882747755}
+  - {fileID: 882765713}
+  - {fileID: 334982868}
+  - {fileID: 65414682}
+  - {fileID: 137514234}
+  - {fileID: 2019632912}
+  - {fileID: 1628316145}
+  spritePrimavera:
+  - {fileID: 1262197681}
+  - {fileID: 1844387213}
+  - {fileID: 1630956049}
+  - {fileID: 422968340}
+  - {fileID: 1168951718}
+  - {fileID: 1395911588}
+  - {fileID: 1247058807}
+  FadeSpeed: 0.002
   contador: 0
   topeSeason: 12
 --- !u!1 &1168951717
@@ -2038,7 +2064,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 8374af436394307468b4a946ad81c062, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2411,7 +2437,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 7e6bf83704314454c94d6efb706a871e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2437,7 +2463,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1350722290
 Transform:
   m_ObjectHideFlags: 0
@@ -2446,14 +2472,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1350722289}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.2486, y: 2, z: 0}
+  m_LocalPosition: {x: 1.2485962, y: 2, z: 0}
   m_LocalScale: {x: 266.23267, y: 194.81265, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1486230132}
   - {fileID: 1803978578}
   m_Father: {fileID: 1139847239}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1350722291
 SpriteRenderer:
@@ -2497,7 +2523,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 4e7c76cb49eced9468d2c6fc4f4d871b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2861,7 +2887,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 953badfb5a7517944aa98736025ac950, type: 3}
-  m_Color: {r: 0.1737273, g: 0.754717, b: 0.2113512, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2887,7 +2913,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1487862928
 Transform:
   m_ObjectHideFlags: 0
@@ -2905,7 +2931,7 @@ Transform:
   - {fileID: 1325085830}
   - {fileID: 1198922340}
   m_Father: {fileID: 1139847239}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1487862929
 SpriteRenderer:
@@ -2949,7 +2975,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 4e7c76cb49eced9468d2c6fc4f4d871b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3295,7 +3321,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 953badfb5a7517944aa98736025ac950, type: 3}
-  m_Color: {r: 0.7396226, g: 0.905286, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3379,7 +3405,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 332480a0d0ad8954fb3996708ec5c9cd, type: 3}
-  m_Color: {r: 0.5633678, g: 0.58648354, b: 0.7075472, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3547,7 +3573,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 332480a0d0ad8954fb3996708ec5c9cd, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3835,7 +3861,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 7e6bf83704314454c94d6efb706a871e, type: 3}
-  m_Color: {r: 0.78679246, g: 0.88350815, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4079,7 +4105,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 953badfb5a7517944aa98736025ac950, type: 3}
-  m_Color: {r: 1, g: 0.5257206, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4240,7 +4266,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 8374af436394307468b4a946ad81c062, type: 3}
-  m_Color: {r: 0.5633678, g: 0.58648354, b: 0.7075472, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4446,6 +4472,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1381303309}
         m_TargetAssemblyTypeName: DeckScript, Assembly-CSharp
         m_MethodName: intento
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1139847240}
+        m_TargetAssemblyTypeName: SeasonChanger, Assembly-CSharp
+        m_MethodName: prueba
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -16,10 +16,17 @@ public class SeasonChanger : MonoBehaviour
     private const int SEASON_COUNT = 4;
 
     private Season temporada;
-    public GameObject verano;
-    public GameObject invierno;
-    public GameObject otono;
-    public GameObject primavera;  
+    public List<SpriteRenderer> spritesVerano = new List<SpriteRenderer>();
+    ///public GameObject verano;
+    public List<SpriteRenderer> spriteInvierno = new List<SpriteRenderer>();
+  ///  public GameObject invierno;
+    public List<SpriteRenderer> spriteOtono = new List<SpriteRenderer>();
+  ///  public GameObject otono;
+    public List<SpriteRenderer> spritePrimavera = new List<SpriteRenderer>();
+  ///  public GameObject primavera;
+
+
+    public float FadeSpeed;
 
 
     [SerializeField]
@@ -29,7 +36,7 @@ public class SeasonChanger : MonoBehaviour
 
 
     //Variables de temporadas
-    private void TemporadaVerano()
+  /*  private void TemporadaVerano()
     {
         verano.SetActive(true);
         invierno.SetActive(false);
@@ -63,7 +70,7 @@ public class SeasonChanger : MonoBehaviour
         otono.SetActive(false);
         primavera.SetActive(true);
     }
-
+  */
 
     // Cambiador de temporada con contador incluido y retorna temporada como enum
     public Season TickSeason()
@@ -76,7 +83,7 @@ public class SeasonChanger : MonoBehaviour
         }
         return temporada;
     }
-  
+
 
     //ESTO ES PARA EL DROPDOWN
     public void ChangeSeason(Season val)
@@ -85,6 +92,12 @@ public class SeasonChanger : MonoBehaviour
         Cambiador();
     }
 
+    public void prueba()
+    {
+        Debug.Log("boton presionado");
+        temporada = temporada++;
+        Cambiador();
+    }
 
     //Funcion que cambia la tempo
     private void Cambiador()
@@ -93,18 +106,52 @@ public class SeasonChanger : MonoBehaviour
         switch (temporada)
         {
             case Season.Spring:
-                TemporadaPrimavera();
+                StartCoroutine(Fadetotemp(spriteInvierno,spritePrimavera));
                 return;
             case Season.Summer:
-                TemporadaVerano();
+                StartCoroutine(Fadetotemp(spritePrimavera, spritesVerano));
                 return;
             case Season.Fall:
-                TemporadaOtono();
+                StartCoroutine(Fadetotemp(spritesVerano, spriteOtono));
                 return;
             case Season.Winter:
-                TemporadaInvierno();
+                StartCoroutine(Fadetotemp(spriteOtono, spriteInvierno));
                 return;
         }
     }
+
+    
+
+    private IEnumerator Fadetotemp(List<SpriteRenderer>pepito,List<SpriteRenderer>pepito2)
+    {
+        
+        for (int f = 0; f < pepito.Count; f++)
+        {
+            while (pepito[f].color.a > 0f)
+            {
+                float fadeAmount = Mathf.Clamp(pepito[f].color.a - (FadeSpeed * Time.deltaTime), 0, 1);
+                Color objectColor = new Color(pepito[f].color.r, pepito[f].color.g, pepito[f].color.b, fadeAmount);
+                pepito[f].color = objectColor;
+
+            }
+     
+            for (int k = 0; k < pepito2.Count; k++)
+            {
+                while (pepito2[k].color.a < 1)
+                {
+                  
+                    float fadeAmountV = Mathf.Clamp(pepito2[k].color.a + (FadeSpeed * Time.deltaTime), 0, 1);
+
+
+                    Color objectVerano = new Color(pepito2[k].color.r, pepito2[k].color.g, pepito2[k].color.b, fadeAmountV);
+                    pepito2[k].color = objectVerano;
+
+                }
+                yield return null;
+            }   
+        }
+    }
 }
+    
+
 
