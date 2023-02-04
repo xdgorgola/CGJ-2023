@@ -83,10 +83,12 @@ public class BoardComponent : MonoBehaviour
     [SerializeField]
     private Camera _cam;
 
-    private List<(int, int)> _rootEndpoints; // Endpoint positions inside the matrix
- 
-
+    private HashSet<(int, int)> _rootEndpoints; // Endpoint positions inside the matrix
     private Vector3Int _origin; // Top left corner of tilemap
+
+    [Tooltip("Color the tiles will be tinted to when they can be used to add a new root")]
+    [SerializeField]
+    private Color _rootableTilesColor = new Color(0, 1, 0, 0.25f);
 
     private void Awake()
     {
@@ -122,16 +124,7 @@ public class BoardComponent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach(var (rootI, rootJ) in _rootEndpoints)
-            for (int i = 0; i < _boardHeight; i++)
-                for(int j = 0; j < _boardWidth; j++)
-                    if(CanPlaceRootInCell(i,j, rootI, rootJ))
-                    {
-                        var position = BoardIndexToTilemapPosition(i, j);
-                        SetTileAndRenderIt(i, j, TileTypes.White, Layers.Overlays);
-                        _overLays.SetTileFlags(position, TileFlags.None);
-                        _overLays.SetColor(position, new Color(0,1,0,0.5f));
-                    }
+
     }
 
     private void InitBoard()
@@ -177,13 +170,37 @@ public class BoardComponent : MonoBehaviour
 
     }
 
-    private bool DestroyRock(Vector2 worldPosition)
+    /// <summary>
+    /// Try to destroy a Rock in the specified position. 
+    /// </summary>
+    /// <param name="worldPosition">position of the world matching a cell in the grid</param>
+    /// <returns>false if no action was performed or position is invalid, true otherwise</returns>
+    public bool DestroyRock(Vector2 worldPosition)
     {
+        Vector2Int? boardPos = WorldPosToBoardPos(worldPosition);
+        if (boardPos is Vector2Int v && GetTypeOfCell(v.x, v.y) == TileTypes.Rock)
+        {
+            SetTile(v.x, v.y, TileTypes.Dirt);
+            return true;
+        }
+
         return false;
     }
 
-    private bool DiscoverCell(Vector2 worldPositon)
+    /// <summary>
+    /// Try to discover a hidden cell in the specified position. 
+    /// </summary>
+    /// <param name="worldPosition">position of the world matching a cell in the grid</param>
+    /// <returns>false if no action was performed or position is invalid, true otherwise</returns>
+    public bool DiscoverCell(Vector2 worldPosition)
     {
+        Vector2Int? boardPos = WorldPosToBoardPos(worldPosition);
+        if (boardPos is Vector2Int v && GetTypeOfCell(v.x, v.y, Layers.Visibility) == TileTypes.Invisible)
+        {
+            SetTile(v.x, v.y, TileTypes.Nothing, Layers.Visibility);
+            return true;
+        }
+
         return false;
     }
 
@@ -217,6 +234,8 @@ public class BoardComponent : MonoBehaviour
 
         return null;
     }
+
+    private TileTypes GetTypeOfCell(int i, int j, Layers layer = Layers.Ground) =>_board[(int)layer, i, j];    
 
     private TileTypes TileToType(Tile tile)
     {
@@ -270,7 +289,7 @@ public class BoardComponent : MonoBehaviour
     /// </summary>
     /// <param name="worldPosition"> Position in world coordinates, z coordinate is not important </param>
     /// <returns> null if outside of game matrix, (i,j) indices otherwise </returns>
-    private Vector2Int? WorldPosToBoardPosition(Vector2 worldPosition)
+    private Vector2Int? WorldPosToBoardPos(Vector2 worldPosition)
     {
         Vector3Int cellPosition = _origin - _playableTilemap.WorldToCell(worldPosition);
         cellPosition.x *= -1; // PQC lol
@@ -361,7 +380,7 @@ public class BoardComponent : MonoBehaviour
         // Set all cells as not visible
         ObscureBoard();
 
-        _rootEndpoints = new List<(int, int)>();
+        _rootEndpoints = new HashSet<(int, int)>();
         // Clear invisible cells where there's root
         for(int i = 0; i < _boardHeight; i++)
             for(int j = 0; j < _boardWidth; j++)
@@ -382,15 +401,29 @@ public class BoardComponent : MonoBehaviour
             }
     }
 
+    public bool ValidPosition(Vector2 worldPos)
+    {
+        Vector2Int? boardCoords = WorldPosToBoardPos(worldPos);
 
-    private bool CanPlaceRootInCell(int i, int j, int fromI, int fromJ, int reach = 1)
+        if (boardCoords is Vector2Int v)
+            return InsideBoard(v.x, v.y);
+
+        return false;
+    }
+
+    public bool IsBlocked(int i, int j)
+    {
+        return _board[(int) Layers.Ground,i,j] == TileTypes.Rock || _board[(int) Layers.Roots,i,j] != TileTypes.Nothing;
+    }
+
+    public bool CanPlaceRootInCell(int i, int j, int fromI, int fromJ, int reach = 1)
     {
         // from position is inside board and is a root endpoint?
         if (!InsideBoard(fromI, fromJ) || _board[(int)Layers.Roots, fromI, fromJ] != TileTypes.RootEndpoint)
             return false; // origin is not a valid start
 
         // Cell is empty and inside the board?
-        if (_board[(int)Layers.Roots, i, j] != TileTypes.Nothing && InsideBoard(i,j))
+        if (!InsideBoard(i,j) || IsBlocked(i,j))
             return false; // not empty, can't place it there
 
         // Now we have to check if the specified position can be reached from the
@@ -420,7 +453,37 @@ public class BoardComponent : MonoBehaviour
         return false;
     }
 
-    private bool SetCellToRoot(int i,int j, int fromI, int fromJ, int reach = 1)
+    public void ClearCellsAround(int i, int j, int reach = 1)
+    {
+        for(int a = -reach; a <= reach; a++)
+            for(int b = -reach; b <= reach; b++)
+            {
+                int newI, newJ;
+                newI = i + a;
+                newJ = j + b;
+                if (InsideBoard(newI, newJ))
+                    SetTile(newI, newJ, TileTypes.Nothing, Layers.Visibility);
+            }
+    }
+
+    public bool SetCellToRoot(Vector2 worldPosTo, Vector2 worldPosFrom, int reach = 1)
+    {
+        Vector2Int boardPosTo, boardPosFrom;
+
+        if (WorldPosToBoardPos(worldPosTo) is Vector2Int v0)
+            boardPosTo = v0;
+        else
+            return false;
+
+        if (WorldPosToBoardPos(worldPosFrom) is Vector2Int v1)
+            boardPosFrom = v1;
+        else
+            return false;
+
+        return SetCellToRoot(boardPosTo.x, boardPosTo.y, boardPosFrom.x, boardPosFrom.y, reach);
+    }
+
+    public bool SetCellToRoot(int i,int j, int fromI, int fromJ, int reach = 1)
     {
         if (!CanPlaceRootInCell(i, j, fromI, fromJ, reach))
             return false; // if can't place root here, just don't
@@ -428,17 +491,67 @@ public class BoardComponent : MonoBehaviour
         SetTileAndRenderIt(i, j, TileTypes.RootEndpoint, Layers.Roots);
         SetTileAndRenderIt(fromI, fromJ, TileTypes.Root, Layers.Roots);
 
-        // Now we have to clear cells around new root 
-        for (int a = -1; a < 2; a++)
-            for(int b = -1; b < 2; b++)
-            {
-                int newI, newJ;
-                newI = i + a;
-                newJ = j + b;
+        _rootEndpoints.Remove((fromI, fromJ));
+        _rootEndpoints.Add((i, j));
 
-                if (InsideBoard(newI, newJ))
-                    SetTileAndRenderIt(newI, newJ, TileTypes.Invisible, Layers.Visibility);
-            }
+        // Now we have to clear cells around new root 
+        ClearCellsAround(i, j);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Mark tiles as rootable when requested so 
+    /// </summary>
+    /// <param name="active">if tiles should be colored as active or turn invisible as unactive</param>
+    public void MarkRootableTiles(bool active = true)
+    {
+        Color color = _rootableTilesColor;
+        if (active)
+            color.a = 0;
+
+        foreach (var (rootI, rootJ) in _rootEndpoints)
+            for (int i = 0; i < _boardHeight; i++)
+                for (int j = 0; j < _boardWidth; j++)
+                    if (!active || CanPlaceRootInCell(i, j, rootI, rootJ)) // when active es false, this will be true for any cell
+                    {
+                        var position = BoardIndexToTilemapPosition(i, j);
+                        SetTileAndRenderIt(i, j, TileTypes.White, Layers.Overlays);
+                        _overLays.SetTileFlags(position, TileFlags.None);
+                        _overLays.SetColor(position, color);
+                    }
+    }
+
+    /// <summary>
+    /// Try to split a root in position i,j in board
+    /// </summary>
+    /// <returns>If could actually split</returns>
+    public bool SplitRoot(int rootI, int rootJ, int newRoot0i, int newRoot0j, int newRoot1i, int newRoot1j, int reach = 1)
+    {
+        // Check if all positions are inside the board and two new positions are possible and different
+        if (!InsideBoard(rootI, rootJ) || !InsideBoard(newRoot0i, newRoot0j) || !InsideBoard(newRoot1i, newRoot1j) || (newRoot0i == newRoot1i && newRoot0j == newRoot1j))
+            return false;
+
+        // Check that splitting in root i,j is possible: In root i,j there's a root endpoint
+        // and new root positions are rootable
+        if (
+            GetTypeOfCell(rootI, rootJ, Layers.Roots) != TileTypes.RootEndpoint || 
+            !CanPlaceRootInCell(newRoot0i, newRoot0i, rootI, rootJ, reach) || 
+            !CanPlaceRootInCell(newRoot1i, newRoot1i, rootI, rootJ, reach)
+            )
+            return false;
+
+        // Now that we're sure that these are valid positions to place new roots, then place it and replace old root
+        SetTile(rootI, rootJ, TileTypes.Root, Layers.Roots);
+        _rootEndpoints.Remove((rootI, rootJ));
+
+        SetTile(newRoot0i, newRoot0j, TileTypes.RootEndpoint);
+        _rootEndpoints.Add((newRoot0i, newRoot0j));
+        SetTile(newRoot1i, newRoot1j, TileTypes.RootEndpoint);
+        _rootEndpoints.Add((newRoot1i, newRoot1j));
+
+        ClearCellsAround(newRoot0i, newRoot0j);
+        ClearCellsAround(newRoot1i, newRoot1j);
 
         return true;
     }
