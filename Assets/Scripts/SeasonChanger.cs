@@ -14,27 +14,29 @@ public enum Season
 public class SeasonChanger : MonoBehaviour
 {
     private const int SEASON_COUNT = 4;
-    private List<SpriteRenderer> currentSeason = new List<SpriteRenderer>();
-    private List<SpriteRenderer> nextSeason = new List<SpriteRenderer>();
+    private List<SpriteRenderer> currentSeason;
     
-    private Season temporada;
-    public List<SpriteRenderer> spritesVerano = new List<SpriteRenderer>();
+    [SerializeField] private Season temporada;
+    [SerializeField] private List<SpriteRenderer> spritesVerano = new List<SpriteRenderer>();
     ///public GameObject verano;
-    public List<SpriteRenderer> spriteInvierno = new List<SpriteRenderer>();
-  ///  public GameObject invierno;
-    public List<SpriteRenderer> spriteOtono = new List<SpriteRenderer>();
-  ///  public GameObject otono;
-    public List<SpriteRenderer> spritePrimavera = new List<SpriteRenderer>();
+    [SerializeField] private List<SpriteRenderer> spriteInvierno = new List<SpriteRenderer>();
+    ///  public GameObject invierno;
+    [SerializeField] private List<SpriteRenderer> spriteOtono = new List<SpriteRenderer>();
+    ///  public GameObject otono;
+    [SerializeField] private List<SpriteRenderer> spritePrimavera = new List<SpriteRenderer>();
   ///  public GameObject primavera;
 
-
     public float FadeSpeed;
-
 
     [SerializeField]
     private int contador = 0;
     [SerializeField]
     private int topeSeason = 12;// para asegurar 12 turnos
+
+    public void Start()
+    {
+        currentSeason = spritePrimavera;
+    }
 
     public Season TickSeason()
     {
@@ -48,14 +50,21 @@ public class SeasonChanger : MonoBehaviour
     }
 
 
-    //ESTO ES PARA EL DROPDOWN
+    
     public void ChangeSeason(Season val)
     {
         temporada = val;
         Cambiador();
     }
 
-  
+    //ESTO ES PARA EL DROPDOWN
+    public void ChangeSeasonDropdown(int val)
+    {
+        temporada = (Season)val;
+        Cambiador();
+    }
+
+
 
     //Funcion que cambia la tempo
     private void Cambiador()
@@ -64,24 +73,20 @@ public class SeasonChanger : MonoBehaviour
         switch (temporada)
         {
             case Season.Spring:
-                currentSeason = spritePrimavera;
-                nextSeason = spritesVerano; 
-                StartCoroutine(Fadetotemp(currentSeason,nextSeason));
+                
+                StartCoroutine(Fadetotemp(currentSeason, spritePrimavera));
                 return;
             case Season.Summer:
-                currentSeason = spritesVerano;
-                nextSeason = spriteOtono;
-                StartCoroutine(Fadetotemp(currentSeason, nextSeason));
+                
+                StartCoroutine(Fadetotemp(currentSeason, spritesVerano));
                 return;
             case Season.Fall:
-                currentSeason = spriteOtono;
-                nextSeason = spriteInvierno;
-                StartCoroutine(Fadetotemp(currentSeason, nextSeason));
+                
+                StartCoroutine(Fadetotemp(currentSeason, spriteOtono));
                 return;
             case Season.Winter:
-                currentSeason = spriteInvierno;
-                nextSeason = spritePrimavera;
-                StartCoroutine(Fadetotemp(currentSeason, nextSeason));
+                
+                StartCoroutine(Fadetotemp(currentSeason, spriteInvierno));
                 return;
             
         }
@@ -91,38 +96,45 @@ public class SeasonChanger : MonoBehaviour
 
     private IEnumerator Fadetotemp(List<SpriteRenderer>actualSeason,List<SpriteRenderer>nextSeason)
     {
-        
-        for (int f = 0; f < actualSeason.Count; f++)
+        if (nextSeason == actualSeason)
         {
-            while (actualSeason[f].color.a > 0f)
+            yield return null;
+        }
+        else
+        {
+            for (int f = 0; f < actualSeason.Count; f++)
             {
-                float fadeAmount = Mathf.Clamp(actualSeason[f].color.a - (FadeSpeed * Time.deltaTime), 0, 1);
-                Color objectColor = new Color(actualSeason[f].color.r, actualSeason[f].color.g, actualSeason[f].color.b, fadeAmount);
-                actualSeason[f].color = objectColor;
+                Debug.Log("Entre");
+                while (actualSeason[f].color.a > 0f)
+                {
+                    Debug.Log(actualSeason[f].color.a);
+                    float fadeAmount = Mathf.Clamp(actualSeason[f].color.a - FadeSpeed * Time.deltaTime, 0, 1);
+                    Color objectColor = new Color(actualSeason[f].color.r, actualSeason[f].color.g, actualSeason[f].color.b, fadeAmount);
+                    actualSeason[f].color = objectColor;
+                    yield return null;
+                }
+                Debug.Log("Sali");
+
+                
+                for (int k = 0; k < nextSeason.Count; k++)
+                {
+                    Debug.Log("Entre1");
+                    while (nextSeason[k].color.a < 1)
+                    {
+                        Debug.Log(nextSeason[k].color.a);
+                        float fadeAmountV = Mathf.Clamp(nextSeason[k].color.a + FadeSpeed * Time.deltaTime, 0, 1);
+                        Color objectVerano = new Color(nextSeason[k].color.r, nextSeason[k].color.g, nextSeason[k].color.b, fadeAmountV);
+                        nextSeason[k].color = objectVerano;
+                        yield return null;
+
+                    }
+                    Debug.Log("Sali1");
+                }
+                
 
             }
-
-            for (int k = 0; k < nextSeason.Count; k++)
-            {
-                while (nextSeason[k].color.a < 1)
-                {
-
-                    float fadeAmountV = Mathf.Clamp(nextSeason[k].color.a + (FadeSpeed * Time.deltaTime), 0, 1);
-
-
-                    Color objectVerano = new Color(nextSeason[k].color.r, nextSeason[k].color.g, nextSeason[k].color.b, fadeAmountV);
-                    nextSeason[k].color = objectVerano;
-
-                }
-            }
-                currentSeason = nextSeason;
-                nextSeason = null;
-                if(currentSeason == actualSeason && nextSeason == null)
-                {
-                    yield break;
-                }
-                yield return null;
-              
+            currentSeason = nextSeason;
+            yield return null;
         }
     }
 }
