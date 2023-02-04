@@ -18,13 +18,6 @@ public class ChooseCardText : MonoBehaviour
     private float _dissapearTime = 0.7f;
 
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-            DisplayText();
-    }
-
-
     public void DisplayText()
     {
         StartCoroutine(DisplayTextRoutine());
