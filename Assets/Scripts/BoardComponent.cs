@@ -4,8 +4,21 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
 
+[RequireComponent(typeof(LineRenderer))]
 public class BoardComponent : MonoBehaviour
 {
+    
+    public struct Collected
+    {
+        public Collected(int water, int nutrients)
+        {
+            this.water = water;
+            this.nutrients = nutrients;
+        }
+
+        public readonly int water; 
+        public readonly int nutrients; 
+    }
 
     public enum TileTypes
     {
@@ -82,6 +95,7 @@ public class BoardComponent : MonoBehaviour
     private GameObject _grid;         // Grid containing tilemap
     [SerializeField]
     private Camera _cam;
+    public Camera cam { get { return _cam;  } }
 
     private HashSet<(int, int)> _rootEndpoints; // Endpoint positions inside the matrix
     private Vector3Int _origin; // Top left corner of tilemap
@@ -90,8 +104,16 @@ public class BoardComponent : MonoBehaviour
     [SerializeField]
     private Color _rootableTilesColor = new Color(0, 1, 0, 0.25f);
 
+    // Used to be cloned and rendered when putting a new root
+    private LineRenderer _lineRender;
+
+    // Line renders generated for each position, they're null when there's no root in that cell
+    private GameObject[,] _lineRenderObjects; 
+
     private void Awake()
     {
+        _lineRender = GetComponent<LineRenderer>();
+
         // Properly set up origin first thing
         SetUpTilemap();
     }
@@ -127,6 +149,11 @@ public class BoardComponent : MonoBehaviour
 
     }
 
+    public Collected Tick()
+    {
+        return new Collected(0, 0);
+    }
+
     private void InitBoard()
     {
         // Init set of tiles
@@ -158,9 +185,9 @@ public class BoardComponent : MonoBehaviour
         for (int i = 0; i < _boardHeight; i++)
             for (int j = 0; j < _boardWidth; j++)
             {
-                Tile groundTile = (Tile) _groundTilemap.GetTile(BoardIndexToTilemapPosition(i, j));
-                Tile rootTile   = (Tile) _rootTilemap.GetTile(BoardIndexToTilemapPosition(i, j));
-                Tile visibilityTile  = (Tile) _visibilityTilemap.GetTile(BoardIndexToTilemapPosition(i, j));
+                Tile groundTile = (Tile) _groundTilemap.GetTile(BoardPosToTilemapPos(i, j));
+                Tile rootTile   = (Tile) _rootTilemap.GetTile(BoardPosToTilemapPos(i, j));
+                Tile visibilityTile  = (Tile) _visibilityTilemap.GetTile(BoardPosToTilemapPos(i, j));
                 _board[(int)Layers.Ground, i,j] = TileToType(groundTile);
                 _board[(int)Layers.Roots, i, j] = TileToType(rootTile);
                 _board[(int)Layers.Visibility, i, j] = TileToType(visibilityTile);
@@ -227,6 +254,10 @@ public class BoardComponent : MonoBehaviour
                 return _defaultObscureTile;
             case TileTypes.White:
                 return _whiteTile;
+            case TileTypes.RootEndpoint:
+                return _rootTileEndpoint;
+            case TileTypes.Root:
+                return _rootTile;
             default:
                 Debug.LogError("Unknown Type of Tile. Maybe you forgot to handle a new type of tile?");
                 break;
@@ -281,7 +312,7 @@ public class BoardComponent : MonoBehaviour
         return null;
     }
 
-    private Vector3Int BoardIndexToTilemapPosition(int i, int j) => new(j + _origin.x, -i + _origin.y, _origin.z);
+    private Vector3Int BoardPosToTilemapPos(int i, int j) => new Vector3Int(j + _origin.x, -i + _origin.y, _origin.z);
 
 
     /// <summary>
@@ -313,7 +344,7 @@ public class BoardComponent : MonoBehaviour
                 {
                     if (layer == (int)Layers.Playable) continue;
 
-                    Vector3Int p = BoardIndexToTilemapPosition(i,j);
+                    Vector3Int p = BoardPosToTilemapPos(i,j);
                     var type = _board[layer, i, j];
                     var tile = TypeToTile(type);
                     var tilemap = GetTilemapOfLayer((Layers) layer);
@@ -325,7 +356,7 @@ public class BoardComponent : MonoBehaviour
     {
         SetTile(i, j, type, layer);
 
-        var position = BoardIndexToTilemapPosition(i, j);
+        var position = BoardPosToTilemapPos(i, j);
         var tile = TypeToTile(type);
 
         _board[(int)layer, i, j] = type;
@@ -377,6 +408,20 @@ public class BoardComponent : MonoBehaviour
     /// </summary>
     private void InitRootSystem()
     {
+        _lineRenderObjects = new GameObject[_boardHeight, _boardWidth];
+
+        // Use line render to define where's the first root, use it's endpoint in particular
+        Debug.Assert(_lineRender.positionCount == 2, "Initial line render for root rendering should have just two positions, one of them being the starting point");
+        Vector3 worldPosOfRoot = _lineRender.GetPosition(1);
+        Vector2Int? positionOfRoot = WorldPosToBoardPos(worldPosOfRoot);
+        Vector2Int boardPosOfRoot = positionOfRoot ?? Vector2Int.zero;
+
+        // Sanity check
+        Debug.Assert(positionOfRoot != null, "Default root position specified by line render's second point is not a valid board position");
+
+        // Set root to the specified position
+        SetTileAndRenderIt(boardPosOfRoot.x, boardPosOfRoot.y, TileTypes.RootEndpoint, Layers.Roots);
+
         // Set all cells as not visible
         ObscureBoard();
 
@@ -399,6 +444,15 @@ public class BoardComponent : MonoBehaviour
                 if (_board[(int)Layers.Roots, i,j] == TileTypes.RootEndpoint)
                     _rootEndpoints.Add((i, j));
             }
+        
+        // make root tilemap invisible
+        for(int i = 0; i < _boardHeight; i++)
+            for(int j = 0; j < _boardWidth; j++)
+            {
+                var position = BoardPosToTilemapPos(i, j);
+                _rootTilemap.SetTileFlags(position, TileFlags.None);
+                _rootTilemap.SetColor(position, new Color(0,0,0,0));
+            }
     }
 
     public bool ValidPosition(Vector2 worldPos)
@@ -411,19 +465,49 @@ public class BoardComponent : MonoBehaviour
         return false;
     }
 
+    public bool IsRootEndpoint(Vector2 worldPos)
+    {
+        Vector2Int? boardCoords = WorldPosToBoardPos(worldPos);
+
+        if (boardCoords is Vector2Int v)
+            return IsRootEndpoint(v.x, v.y);
+
+        return false;
+    }
+    
+    public bool IsRootCell(int i, int j)
+    {
+        TileTypes typeOfTile = GetTypeOfCell(i, j, Layers.Roots);
+        return typeOfTile == TileTypes.Root || typeOfTile == TileTypes.RootEndpoint;
+    }
+
+    public bool IsRootEndpoint(int i, int j) => InsideBoard(i, j) && GetTypeOfCell(i, j, Layers.Roots) == TileTypes.RootEndpoint;
+
     public bool IsBlocked(int i, int j)
     {
         return _board[(int) Layers.Ground,i,j] == TileTypes.Rock || _board[(int) Layers.Roots,i,j] != TileTypes.Nothing;
     }
 
+    public bool CanPlaceRootInCell(Vector2 worldPosTo, Vector2 worldPosFrom, int reach = 1)
+    {
+        // convert both positions to board coordinates
+        Vector2Int? boardPosTo = WorldPosToBoardPos(worldPosTo);
+        Vector2Int? boardPosFrom = WorldPosToBoardPos(worldPosFrom);
+
+        if (boardPosTo is Vector2Int v0 && boardPosFrom is Vector2Int v1)
+            return CanPlaceRootInCell(v0.x, v0.y, v1.x, v1.y, reach);
+
+        return false;
+    }
+
     public bool CanPlaceRootInCell(int i, int j, int fromI, int fromJ, int reach = 1)
     {
         // from position is inside board and is a root endpoint?
-        if (!InsideBoard(fromI, fromJ) || _board[(int)Layers.Roots, fromI, fromJ] != TileTypes.RootEndpoint)
+        if (!InsideBoard(fromI, fromJ) || !IsRootEndpoint(fromI, fromJ))
             return false; // origin is not a valid start
 
         // Cell is empty and inside the board?
-        if (!InsideBoard(i,j) || IsBlocked(i,j))
+        if (!InsideBoard(i,j) || IsBlocked(i,j) || IsRootCell(i,j))
             return false; // not empty, can't place it there
 
         // Now we have to check if the specified position can be reached from the
@@ -462,7 +546,7 @@ public class BoardComponent : MonoBehaviour
                 newI = i + a;
                 newJ = j + b;
                 if (InsideBoard(newI, newJ))
-                    SetTile(newI, newJ, TileTypes.Nothing, Layers.Visibility);
+                    SetTileAndRenderIt(newI, newJ, TileTypes.Nothing, Layers.Visibility);
             }
     }
 
@@ -470,17 +554,10 @@ public class BoardComponent : MonoBehaviour
     {
         Vector2Int boardPosTo, boardPosFrom;
 
-        if (WorldPosToBoardPos(worldPosTo) is Vector2Int v0)
-            boardPosTo = v0;
-        else
-            return false;
+        if (WorldPosToBoardPos(worldPosTo) is Vector2Int v0 && WorldPosToBoardPos(worldPosFrom) is Vector2Int v1)
+            return SetCellToRoot(v0.x, v0.y, v1.x, v1.y, reach);
 
-        if (WorldPosToBoardPos(worldPosFrom) is Vector2Int v1)
-            boardPosFrom = v1;
-        else
-            return false;
-
-        return SetCellToRoot(boardPosTo.x, boardPosTo.y, boardPosFrom.x, boardPosFrom.y, reach);
+        return false;
     }
 
     public bool SetCellToRoot(int i,int j, int fromI, int fromJ, int reach = 1)
@@ -488,14 +565,31 @@ public class BoardComponent : MonoBehaviour
         if (!CanPlaceRootInCell(i, j, fromI, fromJ, reach))
             return false; // if can't place root here, just don't
 
-        SetTileAndRenderIt(i, j, TileTypes.RootEndpoint, Layers.Roots);
-        SetTileAndRenderIt(fromI, fromJ, TileTypes.Root, Layers.Roots);
+        SetTile(i, j, TileTypes.RootEndpoint, Layers.Roots);
+        SetTile(fromI, fromJ, TileTypes.Root, Layers.Roots);
+
+        // TODO this is gonna crash when reach > 1 since we're not checking for intermediate cells
 
         _rootEndpoints.Remove((fromI, fromJ));
         _rootEndpoints.Add((i, j));
 
         // Now we have to clear cells around new root 
         ClearCellsAround(i, j);
+
+        // Finally, we will render a new line as root. Such line will start in the 
+        // from position.
+        GameObject newLineHolder = new GameObject($"Line holder ({fromI}, {fromJ})");
+        LineRenderer lineRenderer = newLineHolder.AddComponent<LineRenderer>();
+
+        _lineRenderObjects[fromI, fromJ] = newLineHolder;
+
+        SetUpLineRender(lineRenderer);
+
+        // Specify endpoints for new line renderer
+        Vector3 startingPosition = BoardPosToTilemapPos(fromI, fromJ) + new Vector3(0.5f, 0.5f, 0);
+        Vector3 endPosition = BoardPosToTilemapPos(i, j) + new Vector3(0.5f, 0.5f, 0);
+        
+        lineRenderer.SetPositions(new Vector3[] { startingPosition, endPosition });
 
         return true;
     }
@@ -507,7 +601,7 @@ public class BoardComponent : MonoBehaviour
     public void MarkRootableTiles(bool active = true)
     {
         Color color = _rootableTilesColor;
-        if (active)
+        if (!active)
             color.a = 0;
 
         foreach (var (rootI, rootJ) in _rootEndpoints)
@@ -515,11 +609,26 @@ public class BoardComponent : MonoBehaviour
                 for (int j = 0; j < _boardWidth; j++)
                     if (!active || CanPlaceRootInCell(i, j, rootI, rootJ)) // when active es false, this will be true for any cell
                     {
-                        var position = BoardIndexToTilemapPosition(i, j);
+                        var position = BoardPosToTilemapPos(i, j);
                         SetTileAndRenderIt(i, j, TileTypes.White, Layers.Overlays);
                         _overLays.SetTileFlags(position, TileFlags.None);
                         _overLays.SetColor(position, color);
                     }
+    }
+
+    public void MarkRootEndPoints(bool active = true)
+    {
+        Color color = _rootableTilesColor;
+        if (!active)
+            color.a = 0;
+
+        foreach (var (rootI, rootJ) in _rootEndpoints)
+        {
+            var position = BoardPosToTilemapPos(rootI, rootJ);
+            SetTileAndRenderIt(rootI, rootJ, TileTypes.White, Layers.Overlays);
+            _overLays.SetTileFlags(position, TileFlags.None);
+            _overLays.SetColor(position, color);
+        }
     }
 
     /// <summary>
@@ -556,4 +665,20 @@ public class BoardComponent : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Set up the provided line render so that its configs match the root line render
+    /// </summary>
+    /// <param name="lineRenderer"></param>
+    public void SetUpLineRender(LineRenderer lineRenderer)
+    {
+        var myLineRender = GetComponent<LineRenderer>();
+
+        lineRenderer.colorGradient = myLineRender.colorGradient;
+        lineRenderer.widthCurve = myLineRender.widthCurve;
+        lineRenderer.numCapVertices = myLineRender.numCapVertices;
+        lineRenderer.numCornerVertices = myLineRender.numCornerVertices;
+        lineRenderer.shadowCastingMode = myLineRender.shadowCastingMode;
+        lineRenderer.sortingOrder = myLineRender.sortingOrder;
+        lineRenderer.material = myLineRender.material;
+    }
 }
