@@ -4,12 +4,17 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class PlantComponent : MonoBehaviour
-{   
+{
 
     //VALORES MAXIMOS
     [SerializeField] private float maxAgua;
     [SerializeField] private float maxNutrientes;
     [SerializeField] private float maxVida;
+
+    //VALORES BASE
+    [SerializeField] private float baseAgua;
+    [SerializeField] private float baseNutrientes;
+    [SerializeField] private float baseVida;
 
     //VALORES ACTUALES
     [SerializeField] private float agua;
@@ -23,12 +28,7 @@ public class PlantComponent : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        maxAgua = 20f;
-        maxNutrientes = 10f;
-        maxVida = 10f;
-        agua = 10f;
-        nutrientes = 0f;
-        vida = 10f;
+        resetPlant();
     }
 
     public void ChangeWaterCount(float cost)
@@ -38,7 +38,7 @@ public class PlantComponent : MonoBehaviour
         {
             agua = newWater;
         }
-        
+
     }
 
     public void UpdateLife(float cost)
@@ -56,7 +56,7 @@ public class PlantComponent : MonoBehaviour
     }
 
     public void UpdateNutrients(float cost)
-    {   
+    {
         float newNutrients = Mathf.Clamp(nutrientes + cost, 0, maxNutrientes);
         if (newNutrients < maxNutrientes && newNutrients > 0)
         {
@@ -86,5 +86,19 @@ public class PlantComponent : MonoBehaviour
                 return;
 
         }
+    }
+
+    //Restart All the plant
+    public void resetPlant()
+    {
+        resetStats();
+    }
+
+    //Restart only the stats
+    private void resetStats()
+    {
+        agua = baseAgua;
+        nutrientes = baseNutrientes;
+        vida = baseVida;
     }
 }
