@@ -124,11 +124,10 @@ public class PlantComponent : MonoBehaviour
 
     private void resetLeafs()
     {
-        hojas = new LeafComponent[baseMaxNumHojas];
-
-        for(int i = 0; i < baseMaxNumHojas; i++)
+        for(int i = 0; i < hojas.Length; i++)
         {
-            hojas[i] = new LeafComponent();
+            if (hojas[i].IsActive)
+                hojas[i].KillLeaf();
         }
     }
 
@@ -140,46 +139,25 @@ public class PlantComponent : MonoBehaviour
 
     private void addLeaf()
     {
-        int maxTurns = 0;
-        int pos = 0;
-
-        for(int i = 0; i <baseMaxNumHojas; i++)
+        for(int i = 0; i < hojas.Length; i++)
         {
             if (!hojas[i].IsActive)
             {
-                hojas[i].IsActive = true;
-                hojas[i].Turnos = 0;
+                hojas[i].StartLeaf(turnosHojas);
                 return;
             }
-            else
-            {
-                if (hojas[i].Turnos>=maxTurns)
-                {
-                    maxTurns = hojas[i].Turnos;
-                    pos = i;
-                }
-            }
         }
-
-        hojas[pos].Turnos = 0;
     }
+
 
     public void Tick()
     {   
 
         //Le Hacemos TICK a las hojas
-        for (int i = 0; i < baseMaxNumHojas; i++)
+        for (int i = 0; i < hojas.Length; i++)
         {
             if (hojas[i].IsActive)
-            {
-                if (hojas[i].Turnos == turnosHojas)
-                {
-                    hojas[i].IsActive = false;
-                }
-                hojas[i].addCount();
-                return;
-            }
-
+                hojas[i].Tick();
         }
         int j = 0;
 
