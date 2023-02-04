@@ -168,7 +168,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_3
+      name: GreenBG
       rect:
         serializedVersion: 2
         x: 366
@@ -177,7 +177,7 @@ TextureImporter:
         height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 4, y: 4, z: 5, w: 8}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -714,7 +714,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_29
+      name: Cost
       rect:
         serializedVersion: 2
         x: 401
@@ -723,7 +723,7 @@ TextureImporter:
         height: 18
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 1, y: 1, z: 1, w: 1}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -735,7 +735,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_30
+      name: WoodCost
       rect:
         serializedVersion: 2
         x: 425
@@ -744,7 +744,7 @@ TextureImporter:
         height: 18
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 1, y: 1, z: 1, w: 1}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1470,7 +1470,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_65
+      name: NameFrame
       rect:
         serializedVersion: 2
         x: 17
@@ -1479,7 +1479,7 @@ TextureImporter:
         height: 29
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 2, y: 3, z: 2, w: 2}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1491,7 +1491,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_66
+      name: NameSheet
       rect:
         serializedVersion: 2
         x: 128
@@ -1500,7 +1500,7 @@ TextureImporter:
         height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 2, y: 1, z: 2, w: 2}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1743,7 +1743,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_78
+      name: CardFrame
       rect:
         serializedVersion: 2
         x: 14
@@ -1752,7 +1752,7 @@ TextureImporter:
         height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 12, y: 12, z: 11, w: 11}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1869,7 +1869,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pixelcardassest_v02_84
+      name: DrescriptionCard
       rect:
         serializedVersion: 2
         x: 220
@@ -1878,7 +1878,7 @@ TextureImporter:
         height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 4, y: 4, z: 4, w: 4}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1906,6 +1906,7 @@ TextureImporter:
       pixelcardassest_v02_1: -2076184682
       pixelcardassest_v02_47: 256340639
       pixelcardassest_v02_57: -1970147957
+      CardFrame: -8610607
       pixelcardassest_v02_63: -2022059230
       pixelcardassest_v02_74: -191167714
       pixelcardassest_v02_20: 1868975464
@@ -1925,13 +1926,12 @@ TextureImporter:
       pixelcardassest_v02_67: -931046110
       pixelcardassest_v02_8: -1200026651
       pixelcardassest_v02_40: -1906682635
-      pixelcardassest_v02_65: 1661726457
       pixelcardassest_v02_7: -1328559322
-      pixelcardassest_v02_66: -783874929
-      pixelcardassest_v02_13: -481896843
       pixelcardassest_v02_76: 2027335593
+      pixelcardassest_v02_13: -481896843
       pixelcardassest_v02_51: -662919537
       pixelcardassest_v02_34: 1354293724
+      NameFrame: 1661726457
       pixelcardassest_v02_32: -1328133351
       pixelcardassest_v02_18: -1470056690
       pixelcardassest_v02_17: 908697557
@@ -1946,12 +1946,14 @@ TextureImporter:
       pixelcardassest_v02_25: -1954862371
       pixelcardassest_v02_48: 441379447
       pixelcardassest_v02_24: 944126121
+      NameSheet: -783874929
       pixelcardassest_v02_75: 1599560711
       pixelcardassest_v02_82: -692924625
       pixelcardassest_v02_54: -77537072
       pixelcardassest_v02_22: -820430902
       pixelcardassest_v02_5: 1056168208
       pixelcardassest_v02_43: 2050825104
+      GreenBG: 247907232
       pixelcardassest_v02_23: 705634335
       pixelcardassest_v02_11: 1974616802
       pixelcardassest_v02_77: 196600973
@@ -1960,9 +1962,11 @@ TextureImporter:
       pixelcardassest_v02_72: -545648642
       pixelcardassest_v02_9: -948503519
       pixelcardassest_v02_60: -1121834884
-      pixelcardassest_v02_78: -8610607
+      WoodCost: -181268905
       pixelcardassest_v02_81: -105072543
       pixelcardassest_v02_42: 652569040
+      DrescriptionCard: -1978615509
+      Cost: -2034231179
       pixelcardassest_v02_33: 594699484
       pixelcardassest_v02_46: 1576364704
       pixelcardassest_v02_83: -88955500
@@ -1975,16 +1979,12 @@ TextureImporter:
       pixelcardassest_v02_56: -10267909
       pixelcardassest_v02_28: -1377950806
       pixelcardassest_v02_44: 972302896
-      pixelcardassest_v02_29: -2034231179
-      pixelcardassest_v02_30: -181268905
-      pixelcardassest_v02_61: -1690458398
-      pixelcardassest_v02_3: 247907232
-      pixelcardassest_v02_6: -878817075
-      pixelcardassest_v02_69: -367137782
-      pixelcardassest_v02_12: -1745362662
-      pixelcardassest_v02_84: -1978615509
-      pixelcardassest_v02_37: 1391679401
       pixelcardassest_v02_55: -1812685621
+      pixelcardassest_v02_61: -1690458398
+      pixelcardassest_v02_69: -367137782
+      pixelcardassest_v02_6: -878817075
+      pixelcardassest_v02_12: -1745362662
+      pixelcardassest_v02_37: 1391679401
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
