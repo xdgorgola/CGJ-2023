@@ -16,7 +16,7 @@ MonoBehaviour:
   _description: Rompe 1 Roca
   _picture: {fileID: 0}
   _waterCost: 1
-  _effect: 5
+  _effect: 3
   _params:
   - _paramName: num
     _paramValue: 1

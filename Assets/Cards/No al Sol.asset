@@ -16,7 +16,7 @@ MonoBehaviour:
   _description: "Invoca un clima nublado en 3 d\xEDas durante 3 turnos"
   _picture: {fileID: 0}
   _waterCost: 3
-  _effect: 7
+  _effect: 5
   _params:
   - _paramName: wait
     _paramValue: 3

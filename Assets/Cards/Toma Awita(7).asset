@@ -16,7 +16,7 @@ MonoBehaviour:
   _description: Gana 7 de Agua
   _picture: {fileID: 0}
   _waterCost: 2
-  _effect: 9
+  _effect: 8
   _params:
   - _paramName: quant
     _paramValue: 7

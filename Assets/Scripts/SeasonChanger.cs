@@ -186,7 +186,6 @@ public class SeasonChanger : MonoBehaviour
             newFade = -FadeSpeed;
             while (imagen.color.a > 0f)
             {
-                Debug.Log(imagen.color.a);
                 float fadeAmount = Mathf.Clamp(imagen.color.a + newFade * Time.deltaTime, 0, 1);
                 Color objectColor = new Color(imagen.color.r, imagen.color.g, imagen.color.b, fadeAmount);
                 imagen.color = objectColor;
@@ -197,7 +196,6 @@ public class SeasonChanger : MonoBehaviour
         {
             while (imagen.color.a < 1f)
             {
-                Debug.Log(imagen.color.a);
                 float fadeAmountV = Mathf.Clamp(imagen.color.a + newFade * Time.deltaTime, 0, 1);
                 Color objectVerano = new Color(imagen.color.r, imagen.color.g, imagen.color.b, fadeAmountV);
                 imagen.color = objectVerano;
@@ -205,7 +203,6 @@ public class SeasonChanger : MonoBehaviour
 
             }
         }
-
         yield return null;
 
     }

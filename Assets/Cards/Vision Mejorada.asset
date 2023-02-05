@@ -16,7 +16,7 @@ MonoBehaviour:
   _description: Te permite ver una zona del mapa
   _picture: {fileID: 0}
   _waterCost: 1
-  _effect: 4
+  _effect: 2
   _params:
   - _paramName: num
     _paramValue: 3

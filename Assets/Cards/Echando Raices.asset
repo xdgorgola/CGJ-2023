@@ -10,13 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfd5ad79789578a43ab34656aefc8953, type: 3}
-  m_Name: Toma Awita(5)
+  m_Name: Echando Raices
   m_EditorClassIdentifier: 
-  _name: Toma Awita(5)
-  _description: Gana 5 de Agua
+  _name: Echando Raices
+  _description: Mueve en una direccion alguna punta de tu raiz
   _picture: {fileID: 0}
-  _waterCost: 1
-  _effect: 8
-  _params:
-  - _paramName: quant
-    _paramValue: 5
+  _waterCost: 3
+  _effect: 0
+  _params: []

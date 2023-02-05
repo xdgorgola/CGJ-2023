@@ -38,6 +38,7 @@ public class PlantComponent : MonoBehaviour
     //Events
     [SerializeField] private UnityEvent OnFlowerDeath = new UnityEvent();
     [SerializeField] private UnityEvent OnNutrientsCap = new UnityEvent();
+    public UnityEvent<GameCards> OnUsedCard = new UnityEvent<GameCards>();
 
 
     private void Awake()
@@ -48,12 +49,8 @@ public class PlantComponent : MonoBehaviour
 
     public void ChangeWaterCount(float cost)
     {
-        float newWater = Mathf.Clamp(agua + cost, 0, maxAgua);
-        if (newWater < maxAgua && newWater > 0)
-        {
-            agua = (int)newWater;
-        }
-        else if (newWater == 0)
+        agua = (int)Mathf.Clamp(agua + cost, 0, maxAgua);
+        if (agua <= 0)
         {
             if (OnFlowerDeath != null)
                 OnFlowerDeath.Invoke();
@@ -72,8 +69,8 @@ public class PlantComponent : MonoBehaviour
         }
         else if (newNutrients == maxNutrientes)
         {
-            //TRIGGER PARA CONSEGUIR MEJORA
-            OnNutrientsCap.Invoke();
+            if (OnNutrientsCap != null)
+                OnNutrientsCap.Invoke();
             nutrientes = 0;
         }
 
@@ -82,30 +79,27 @@ public class PlantComponent : MonoBehaviour
     public void ReceiveCard(GameCards card)
     {
         CardEffects effect = card.CardEffect;
+
         switch (effect)
         {
             case CardEffects.GainWater: //GANANCIA DE AGUA FIJA POR CARTA
-                ChangeWaterCount(card.WaterCost);
-                ChangeWaterCount(card.GetParams()["quant"]); 
-                return;
-
+                ChangeWaterCount(card.GetParams()["quant"]);
+                break;
             case CardEffects.GainNutrient://GANANCIA DE NUTRIENTES FIJA POR CARTA
-                ChangeWaterCount(card.WaterCost);
                 UpdateNutrients(card.GetParams()["quant"]);
-                return;
-
+                break;
             case CardEffects.BetterWaterAbs://MEJORA DE ABSORCIÓN DE AGUA POR CARTA
-                ChangeWaterCount(card.WaterCost);
-                WaterGainUpgrade nuevaMejora = new WaterGainUpgrade();
-                nuevaMejora.MaxTurnos = (int)card.GetParams()["quant"];
-                absorcionAgua.Add(nuevaMejora);
-                return;
-
+                //WaterGainUpgrade nuevaMejora = new WaterGainUpgrade();
+                //nuevaMejora.MaxTurnos = (int)card.GetParams()["quant"];
+                //absorcionAgua.Add(nuevaMejora);
+                break;
             case CardEffects.GainLeaf://GENERACIÓN DE UNA HOJA POR CARTA
-                ChangeWaterCount(card.WaterCost);
                 addLeaf();
-                return;
+                break;
         }
+        ChangeWaterCount(-card.WaterCost);
+        if (OnUsedCard != null)
+            OnUsedCard.Invoke(card);
     }
 
 
@@ -165,32 +159,31 @@ public class PlantComponent : MonoBehaviour
 
     public void Tick()
     {   
-
         //Le Hacemos TICK a las hojas
         for (int i = 0; i < hojas.Length; i++)
         {
             if (hojas[i].IsActive)
                 hojas[i].Tick();
         }
-        int j = 0;
 
-        //Le hacemos tic a la mejoras temporales de absorción de agua
-        while (j<absorcionAgua.Count)
-        {
-            if(absorcionAgua[j].MaxTurnos <= absorcionAgua[j].Turnos)
-            {
-                absorcionAgua.RemoveAt(j);
-            }
-            else
-            {
-                absorcionAgua[j].addCount();
-                j++;
-            }
-        }
+        //int j = 0;
+        ////Le hacemos tic a la mejoras temporales de absorción de agua
+        //while (j<absorcionAgua.Count)
+        //{
+        //    if(absorcionAgua[j].MaxTurnos <= absorcionAgua[j].Turnos)
+        //    {
+        //        absorcionAgua.RemoveAt(j);
+        //    }
+        //    else
+        //    {
+        //        absorcionAgua[j].addCount();
+        //        j++;
+        //    }
+        //}
 
         //Le haceos Tic al agua y Nutrientes
-        ChangeWaterCount(-1 * consumoAguaXTurno);
-        UpdateNutrients(-1 * consumoNutrienteXTurno);
+        ChangeWaterCount(-consumoAguaXTurno);
+        UpdateNutrients(-consumoNutrienteXTurno);
     }
 }
 

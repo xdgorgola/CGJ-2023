@@ -9,6 +9,8 @@ public class MainMenu : MonoBehaviour
 {
     private CanvasGroup _group = null;
 
+    [SerializeField]
+    private GameObject _mainScreen = null;
 
     private void Awake()
     {
@@ -18,6 +20,7 @@ public class MainMenu : MonoBehaviour
 
     public void ActivateMenu()
     {
+        _mainScreen.SetActive(true);
         StartCoroutine(ActivateMenuRoutine());
     }
 
@@ -38,6 +41,7 @@ public class MainMenu : MonoBehaviour
     {
         yield return StartCoroutine(FadeRoutine(0f));
         _group.interactable = false;
+        _mainScreen.SetActive(false);
     }
 
 

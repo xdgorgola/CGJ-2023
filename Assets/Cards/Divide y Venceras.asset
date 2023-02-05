@@ -16,5 +16,5 @@ MonoBehaviour:
   _description: "Divide una Ra\xEDz en dos"
   _picture: {fileID: 0}
   _waterCost: 1
-  _effect: 3
+  _effect: 1
   _params: []

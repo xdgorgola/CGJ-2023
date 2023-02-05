@@ -77,9 +77,6 @@ public class CardInputUI : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-            ReceiveCard(testCard);
-
         if (!_isEnabled)
             return;
 

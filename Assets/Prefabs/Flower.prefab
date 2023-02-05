@@ -1358,6 +1358,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6623585512265212087}
   - component: {fileID: 6656613351663639606}
+  - component: {fileID: 919132148213679600}
   m_Layer: 0
   m_Name: Flower
   m_TagString: Untagged
@@ -1404,6 +1405,62 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &919132148213679600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5809752656696949261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10a728babef06f345954299c9b15ee8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseAgua: 75
+  baseNutrientes: 0
+  baseMaxAgua: 100
+  baseMaxNutrientes: 50
+  baseMaxNumHojas: 3
+  baseTurnosHojas: 4
+  baseRatioAbsorcionAgua: 1
+  baseRatioAbsorcionNutrientes: 1
+  baseConsumoAguaXTurno: 1
+  baseConsumoNutrienteXTurno: 1
+  hojas:
+  - {fileID: 2081645385487205859}
+  - {fileID: 3904212431520031154}
+  - {fileID: 3904212430588967286}
+  maxAgua: 0
+  maxNutrientes: 0
+  ratioAbsorcionAgua: 0
+  ratioAbsorcionNutrientes: 0
+  agua: 0
+  nutrientes: 0
+  turnosHojas: 0
+  consumoAguaXTurno: 0
+  consumoNutrienteXTurno: 0
+  OnFlowerDeath:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: MainGame, Assembly-CSharp
+        m_MethodName: GameOver
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnNutrientsCap:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUsedCard:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &6182670883014539583
 GameObject:
   m_ObjectHideFlags: 0
@@ -2200,6 +2257,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 52dca0bc6bad0f244bfc61c4d116d2cf, type: 3}
+--- !u!114 &3904212431520031154 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7660488922271440400, guid: 52dca0bc6bad0f244bfc61c4d116d2cf,
+    type: 3}
+  m_PrefabInstance: {fileID: 6656613351204306850}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c8655763204f424a816ed7eb03fd492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8244578586985787649 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3317932570774326947, guid: 52dca0bc6bad0f244bfc61c4d116d2cf,
@@ -2290,6 +2359,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 52dca0bc6bad0f244bfc61c4d116d2cf, type: 3}
+--- !u!114 &3904212430588967286 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7660488922271440400, guid: 52dca0bc6bad0f244bfc61c4d116d2cf,
+    type: 3}
+  m_PrefabInstance: {fileID: 6656613352135370598}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c8655763204f424a816ed7eb03fd492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8244578588202199493 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3317932570774326947, guid: 52dca0bc6bad0f244bfc61c4d116d2cf,
@@ -2380,6 +2461,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 52dca0bc6bad0f244bfc61c4d116d2cf, type: 3}
+--- !u!114 &2081645385487205859 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7660488922271440400, guid: 52dca0bc6bad0f244bfc61c4d116d2cf,
+    type: 3}
+  m_PrefabInstance: {fileID: 8551486201792961523}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c8655763204f424a816ed7eb03fd492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6388164191650698576 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3317932570774326947, guid: 52dca0bc6bad0f244bfc61c4d116d2cf,

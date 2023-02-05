@@ -16,7 +16,7 @@ MonoBehaviour:
   _description: Mejora el Ratio de Ganancia de agua en 1 por 4 turnos.
   _picture: {fileID: 0}
   _waterCost: 2
-  _effect: 12
+  _effect: 10
   _params:
   - _paramName: amount
     _paramValue: 1

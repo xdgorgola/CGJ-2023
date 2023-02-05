@@ -16,5 +16,5 @@ MonoBehaviour:
   _description: "Genera 1 hoja, incrementa absorci\xF3n de nutrientes en 1."
   _picture: {fileID: 0}
   _waterCost: 2
-  _effect: 13
+  _effect: 11
   _params: []
