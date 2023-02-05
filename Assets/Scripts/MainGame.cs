@@ -41,6 +41,7 @@ public class MainGame : MonoBehaviour
 
     private void Awake()
     {
+        _plant.OnUsedCard.AddListener(ReceiveUsedCard);
         _seasonMng.ChangeSeason(_startingSeason);
         _cardInput.ListenOnCardUsed(ReceiveUsedCard);
     }
@@ -71,9 +72,15 @@ public class MainGame : MonoBehaviour
         _cardInput.DiscardHand();
         _cardInput.DisableSystem();
 
-        _particles.UpdateParticles(Weather.NEUTRAL, Season.Spring);
-
+        _particles.UpdateParticles(Weather.NEUTRAL, _startingSeason);
         _seasonMng.ChangeSeason(_startingSeason);
+    }
+
+
+    private void RequestInitialCards()
+    {
+        for (int i = 0; i < _deck.cartasIniciales.Count; ++i)
+            _cardInput.ReceiveCard(_deck.cartasIniciales[i]);
     }
 
 
@@ -88,12 +95,22 @@ public class MainGame : MonoBehaviour
     public void ReceiveUsedCard(GameCards card)
     {
         _receivedCard = card;
+        _successCard = true;
+        _usedCard = true;
+    }
+
+
+    public void ReceiveCanceledCard(GameCards card)
+    {
+        _receivedCard = card;
+        _failedCard = true;
         _usedCard = true;
     }
 
 
     private IEnumerator StartGameRoutine()
     {
+        RequestInitialCards();
         yield return StartCoroutine(InitalRound());
 
         while (_inGame)
@@ -117,19 +134,25 @@ public class MainGame : MonoBehaviour
             yield return new WaitUntil(() => _successCard || _failedCard);
 
             if (_successCard)
+            {
+                _usedCard = false;
+                _successCard = false;
                 break;
+            }
 
             _cardInput.ReceiveCard(_receivedCard);
             _usedCard = false;
+            _failedCard = false;
         }
     }
+
 
     private IEnumerator InitalRound()
     {
         RequestCardsForDeck();
         yield return new WaitForSeconds(1f);
-
         yield return StartCoroutine(CardUseRoutine());
+        yield return new WaitForSeconds(2f);
     }
 
 
@@ -145,8 +168,9 @@ public class MainGame : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(CardUseRoutine());
+        yield return new WaitForSeconds(2f);
 
-        _plant.ChangeWaterCount(-_receivedCard.WaterCost); // mejro pasarle la cosa a la planta y ponerle un default.
+        _particles.UpdateParticles(weather, season);
     }
 
 
@@ -154,9 +178,7 @@ public class MainGame : MonoBehaviour
     {
         switch (card.CardEffect)
         {
-            case CardEffects.MoveHor:
-            case CardEffects.MoveVert:
-            case CardEffects.MoveDiag:
+            case CardEffects.Move:
             case CardEffects.DivideRoot:
             case CardEffects.DiscoverMap:
             case CardEffects.BreakRock:
@@ -169,6 +191,7 @@ public class MainGame : MonoBehaviour
             case CardEffects.GainNutrient:
             case CardEffects.BetterWaterAbs:
             case CardEffects.GainLeaf:
+                _plant.ReceiveCard(card);
                 break;
         }
     }
