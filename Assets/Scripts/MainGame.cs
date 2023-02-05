@@ -20,6 +20,10 @@ public class MainGame : MonoBehaviour
     [SerializeField]
     private WeatherMgr _weatherMng = null;
 
+    // Visuals
+    [SerializeField]
+    private WeatherParticlesSystem _particles = null;
+
     [SerializeField]
     private Season _startingSeason = Season.Spring;
     private GameCards _oldCard = null;
@@ -33,9 +37,10 @@ public class MainGame : MonoBehaviour
     private bool _failedCard = false;
 
 
+    public UnityEvent OnGameOver = new UnityEvent();
+
     private void Awake()
     {
-        _plant.resetPlant();
         _seasonMng.ChangeSeason(_startingSeason);
         _cardInput.ListenOnCardUsed(ReceiveUsedCard);
     }
@@ -48,15 +53,42 @@ public class MainGame : MonoBehaviour
         _failedCard = false;
         _inGame = true;
 
+        _plant.resetPlant();
         StartCoroutine(StartGameRoutine());
+    }
+
+
+    public void GameOver()
+    {
+        _inGame = false;
+        if (OnGameOver != null)
+            OnGameOver.Invoke();
     }
 
 
     private void EndGame()
     {
-        _plant.resetPlant();
         _cardInput.DiscardHand();
+        _cardInput.DisableSystem();
+
+        _particles.UpdateParticles(Weather.NEUTRAL, Season.Spring);
+
         _seasonMng.ChangeSeason(_startingSeason);
+    }
+
+
+    private void RequestCardsForDeck()
+    {
+        int missingCards = _cardInput.MissingCardCount();
+        for (int i = 0; i < missingCards; ++i)
+            _cardInput.ReceiveCard(_deck.DrawCard());
+    }
+
+
+    public void ReceiveUsedCard(GameCards card)
+    {
+        _receivedCard = card;
+        _usedCard = true;
     }
 
 
@@ -72,24 +104,8 @@ public class MainGame : MonoBehaviour
     }
 
 
-    private IEnumerator InitalRound()
+    private IEnumerator CardUseRoutine()
     {
-        RequestCardsForDeck();
-        yield return new WaitForSeconds(1f);
-
-        _cardInput.EnableSystem();
-    }
-
-
-    private IEnumerator DoGameRound()
-    {
-        Season season = _seasonMng.TickSeason();
-        Weather weather = _weatherMng.Tick(season);
-
-        RequestCardsForDeck();
-        
-        yield return new WaitForSeconds(1f);
-
         while (true)
         {
             _cardInput.EnableSystem();
@@ -97,7 +113,7 @@ public class MainGame : MonoBehaviour
 
             _cardInput.DisableSystem();
             ProcessCard(_receivedCard);
-            
+
             yield return new WaitUntil(() => _successCard || _failedCard);
 
             if (_successCard)
@@ -108,11 +124,29 @@ public class MainGame : MonoBehaviour
         }
     }
 
-
-    public void ReceiveUsedCard(GameCards card)
+    private IEnumerator InitalRound()
     {
-        _receivedCard = card;
-        _usedCard = true;
+        RequestCardsForDeck();
+        yield return new WaitForSeconds(1f);
+
+        yield return StartCoroutine(CardUseRoutine());
+    }
+
+
+    private IEnumerator DoGameRound()
+    {
+        _plant.Tick();
+        if (!_inGame)
+            yield break;
+
+        RequestCardsForDeck();
+        Season season = _seasonMng.TickSeason();
+        Weather weather = _weatherMng.Tick(season);
+
+        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(CardUseRoutine());
+
+        _plant.ChangeWaterCount(-_receivedCard.WaterCost); // mejro pasarle la cosa a la planta y ponerle un default.
     }
 
 
@@ -137,12 +171,5 @@ public class MainGame : MonoBehaviour
             case CardEffects.GainLeaf:
                 break;
         }
-    }
-
-    private void RequestCardsForDeck()
-    {
-        int missingCards = _cardInput.MissingCardCount();
-        for (int i = 0; i < missingCards; ++i)
-            _cardInput.ReceiveCard(_deck.DrawCard());
     }
 }

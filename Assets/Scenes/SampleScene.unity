@@ -1956,6 +1956,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64cce6373ea272248a42f976661f3596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentSeason: []
   temporada: 0
   spritesVerano:
   - {fileID: 1350722291}
@@ -1986,7 +1987,7 @@ MonoBehaviour:
   - {fileID: 1168951718}
   - {fileID: 1395911588}
   - {fileID: 1247058807}
-  FadeSpeed: 0.1
+  FadeSpeed: 2
   contador: 0
   topeSeason: 12
 --- !u!1 &1168951717
@@ -2399,7 +2400,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 4e7c76cb49eced9468d2c6fc4f4d871b, type: 3}
-  m_Color: {r: 0.27058825, g: 0.4666667, b: 0.80392164, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3576,7 +3577,7 @@ SpriteRenderer:
   m_SortingLayer: -1
   m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 953badfb5a7517944aa98736025ac950, type: 3}
-  m_Color: {r: 0.19752577, g: 0.764151, b: 0.33674836, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3902,7 +3903,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1358777019
   m_SortingLayer: -1
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 283d2151728458544b32f841a82733c8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
