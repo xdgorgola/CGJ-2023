@@ -12,7 +12,7 @@ public class BoardController : MonoBehaviour
 
     // Used to draw a line from a cell to another when creating a new root
     private List<GameObject> _lineRenderForChoosingTiles;
-    
+
     // To control which action is beind done right now
     private enum RootCreationState
     {
@@ -46,10 +46,15 @@ public class BoardController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && _state == RootCreationState.None)
-        {
-            _startRootCreation = StartCoroutine(StartRootCreation());
-        }
+            _startRootCreation = StartCoroutine(StartRootCreation(2));
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+            StopRootCreation();
+
     }
+
+    public void StopRootCreation() => _state = RootCreationState.None;
+   
 
     IEnumerator StartRootCreation(int nBranches = 1)
     {
@@ -57,22 +62,15 @@ public class BoardController : MonoBehaviour
         _board.MarkRootEndPoints();
         _state = RootCreationState.SelectingRoot;
 
-        while (true)
+        while (_state != RootCreationState.None)
         {
-            if (Input.GetKeyDown(KeyCode.Escape)) // cancel
-            {
-                _board.MarkRootEndPoints(false);
-                _state = RootCreationState.None;
-                break;
-            }
-
             // Get Mouse input
             Vector2 mousePos = GetMousePositionInWorld();
 
             if (Input.GetKeyDown(KeyCode.Mouse0) && _board.IsRootEndpoint(mousePos)) // Selected a valid position
             {
-                _state = RootCreationState.None;
                 // start new coroutine and exit
+                _state = RootCreationState.None;
                 StartCoroutine(StartNextTileSelection(mousePos, nBranches));
                 break;
             }
@@ -80,7 +78,7 @@ public class BoardController : MonoBehaviour
             yield return null;
         }
 
-        // Check if mouse input is valid and start root extension coroutine if so
+        _board.MarkRootEndPoints(false);
     }
 
     IEnumerator StartNextTileSelection(Vector2 startPos, int nBranchs = 1)
@@ -92,22 +90,16 @@ public class BoardController : MonoBehaviour
 
 
         Vector2Int startPosBoardCoords = _board.WorldPosToBoardPos(startPos) ?? Vector2Int.zero;
-        for (int i = 0; i < nBranchs; i++)
+        for (int i = 0; i < nBranchs && _state != RootCreationState.None; i++)
         {
             LineRenderer lineRender = _lineRenderForChoosingTiles[i].GetComponent<LineRenderer>();
             lineRender.enabled = true;
             lineRender.SetPosition(0, startPos);
 
-            while(true)
+            while(_state != RootCreationState.None)
             {
                 Vector2 nextPosition = GetMousePositionInWorld();
                 lineRender.SetPosition(1, nextPosition);
-
-                if (Input.GetKeyDown(KeyCode.Escape)) // Go back to select root
-                {
-                    StartCoroutine(StartRootCreation());
-                    break;
-                }
 
                 Vector2Int? boardPosition = _board.WorldPosToBoardPos(nextPosition);
 
