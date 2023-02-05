@@ -79,7 +79,7 @@ public class MainGame : MonoBehaviour
         _cardInput.DisableSystem();
 
         _weatherMng.RestartWeather();
-        _seasonMng.ChangeSeason(_startingSeason);
+        //_seasonMng.ChangeSeason(_startingSeason);
         _particles.UpdateParticles(Weather.NEUTRAL, _startingSeason);
     }
 
