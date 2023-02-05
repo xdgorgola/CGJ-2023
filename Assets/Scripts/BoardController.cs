@@ -51,7 +51,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    IEnumerator StartRootCreation()
+    IEnumerator StartRootCreation(int nBranches = 1)
     {
         // Mark where you can find root endpoints
         _board.MarkRootEndPoints();
@@ -73,7 +73,7 @@ public class BoardController : MonoBehaviour
             {
                 _state = RootCreationState.None;
                 // start new coroutine and exit
-                StartCoroutine(StartNextTileSelection(mousePos, 2));
+                StartCoroutine(StartNextTileSelection(mousePos, nBranches));
                 break;
             }
 

@@ -621,8 +621,6 @@ public class BoardComponent : MonoBehaviour
 
     public bool SetCellToRoot(Vector2 worldPosTo, Vector2 worldPosFrom, int reach = 1)
     {
-        Vector2Int boardPosTo, boardPosFrom;
-
         if (WorldPosToBoardPos(worldPosTo) is Vector2Int v0 && WorldPosToBoardPos(worldPosFrom) is Vector2Int v1)
             return SetCellToRoot(v0.x, v0.y, v1.x, v1.y, reach);
 
@@ -635,12 +633,14 @@ public class BoardComponent : MonoBehaviour
             return false; // if can't place root here, just don't
 
         SetTile(i, j, TileTypes.RootEndpoint, Layers.Roots);
-        SetTile(fromI, fromJ, TileTypes.Root, Layers.Roots);
 
         // TODO this is gonna crash when reach > 1 since we're not checking for intermediate cells
 
         if (removeOriginalRoot)
+        {
+            SetTile(fromI, fromJ, TileTypes.Root, Layers.Roots);
             _rootEndpoints.Remove((fromI, fromJ));
+        }
 
         _rootEndpoints.Add((i, j));
 
@@ -671,6 +671,7 @@ public class BoardComponent : MonoBehaviour
             return;
 
         SetTile(i, j, TileTypes.Root, Layers.Roots);
+        _rootEndpoints.Remove((i, j));
     }
 
     /// <summary>
