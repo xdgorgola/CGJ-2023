@@ -77,7 +77,10 @@ public class CardInputUI : MonoBehaviour
     {
         if (!_isEnabled)
             return;
-
+        if (Input.GetKeyDown(KeyCode.Space)) 
+        {
+            print("Space");
+        }
         if (Input.GetKeyDown(KeyCode.Space) && !_focusing)
         {
             if (!_showing)

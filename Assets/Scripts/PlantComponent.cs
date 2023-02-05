@@ -39,6 +39,8 @@ public class PlantComponent : MonoBehaviour
     [SerializeField] private UnityEvent OnFlowerDeath = new UnityEvent();
     [SerializeField] private UnityEvent OnNutrientsCap = new UnityEvent();
     public UnityEvent<GameCards> OnUsedCard = new UnityEvent<GameCards>();
+    public UnityEvent<int> OnWaterUpdate = new UnityEvent<int>();
+    public UnityEvent<int> OnNutrientUpdate = new UnityEvent<int>();
 
 
     private void Awake()
@@ -57,6 +59,9 @@ public class PlantComponent : MonoBehaviour
 
             _animator.SetTrigger("Die");
         }
+
+        if (OnWaterUpdate != null)
+            OnWaterUpdate.Invoke(agua);
     }
 
 
@@ -70,6 +75,8 @@ public class PlantComponent : MonoBehaviour
             nutrientes = 0;
         }
 
+        if (OnNutrientUpdate != null)
+            OnNutrientUpdate.Invoke(nutrientes);
     }
 
     public void ReceiveCard(GameCards card)
@@ -121,6 +128,11 @@ public class PlantComponent : MonoBehaviour
         turnosHojas = baseTurnosHojas;
         consumoNutrienteXTurno = baseConsumoNutrienteXTurno;
         consumoAguaXTurno = baseConsumoAguaXTurno;
+
+        if (OnWaterUpdate != null)
+            OnWaterUpdate.Invoke(agua);
+        if (OnNutrientUpdate != null)
+            OnNutrientUpdate.Invoke(nutrientes);
     }
 
 
