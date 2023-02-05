@@ -10,7 +10,6 @@ public class BoardController : MonoBehaviour
 
     // Board implementing game logic
     private BoardComponent _board;
-    private Coroutine _startRootCreation;
 
     public UnityEvent OnRootCreated = new UnityEvent();
     public UnityEvent OnRootCancel = new UnityEvent();
@@ -51,11 +50,10 @@ public class BoardController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && _state == RootCreationState.None)
-            _startRootCreation = StartCoroutine(StartRootCreation(1));
+            StartCoroutine(StartRootCreation(1));
         
         if (Input.GetKeyDown(KeyCode.Escape))
             StopRootCreation();
-
     }
 
     public void StopRootCreation()
@@ -67,7 +65,7 @@ public class BoardController : MonoBehaviour
     }
    
 
-    IEnumerator StartRootCreation(int nBranches = 1)
+    public IEnumerator StartRootCreation(int nBranches = 1)
     {
         // Mark where you can find root endpoints
         _board.MarkRootEndPoints();
@@ -92,7 +90,7 @@ public class BoardController : MonoBehaviour
         _board.MarkRootEndPoints(false);
     }
 
-    IEnumerator StartNextTileSelection(Vector2 startPos, int nBranchs = 1)
+    public IEnumerator StartNextTileSelection(Vector2 startPos, int nBranchs = 1)
     {
         Debug.Assert(1 <= nBranchs && nBranchs <= 8, "Can't branch more than 8 times or less than 1");
         _state = RootCreationState.ExtendingRoot;
@@ -139,7 +137,7 @@ public class BoardController : MonoBehaviour
         foreach(var renderHolder in _lineRenderForChoosingTiles)
             renderHolder.GetComponent<LineRenderer>().enabled = false;
 
-        if (positionsToPlaceRoot.Count > 0)
+        if (positionsToPlaceRoot.Count > 0 && false)
             _board.SetEndpointToRoot(startPosBoardCoords.x, startPosBoardCoords.y);
 
         _board.MarkRootableTiles(false);

@@ -636,7 +636,7 @@ public class BoardComponent : MonoBehaviour
 
         // TODO this is gonna crash when reach > 1 since we're not checking for intermediate cells
 
-        if (removeOriginalRoot)
+        if (removeOriginalRoot && false)
         {
             SetTile(fromI, fromJ, TileTypes.Root, Layers.Roots);
             _rootEndpoints.Remove((fromI, fromJ));
