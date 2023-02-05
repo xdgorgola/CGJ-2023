@@ -21,21 +21,46 @@ public class WeatherMgr : MonoBehaviour
     private int turnos;
     private int alt_turnos;
 
+
     // Start is called before the first frame update
     void Start()
     {
-        clima_actual = Weather.NEUTRAL;
-        sig_clima = Weather.NEUTRAL;
-        turnos = 0;
-        alt_turnos = 0;
-        alter = false;
+        RestartWeather();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public void RestartWeather()
     {
-        
+        clima_actual = Weather.NEUTRAL;
+        sig_clima = Weather.NEUTRAL;
+        alt_turnos = 0;
+        alter = false;
+        turnos = 0;
     }
+
+
+    public void ReceiveCard(GameCards card)
+    {
+        Weather qWeat = Weather.NEUTRAL;
+        switch (card.CardEffect)
+        {
+            case CardEffects.QueueRain:
+                qWeat = Weather.LLUVIA;
+                break;
+            case CardEffects.QueueCloudy:
+                qWeat = Weather.NUBOSO;
+                break;
+            case CardEffects.QueueSunny:
+                qWeat = Weather.SOLEADO;
+                break;
+            case CardEffects.QueueNeutral:
+                qWeat = Weather.NEUTRAL;
+                break;
+        }
+
+        alter_weather((int)card.GetParams()["dur"], qWeat);
+    }
+
 
     public Weather Tick(Season season)
     {

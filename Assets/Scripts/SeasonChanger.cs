@@ -18,13 +18,9 @@ public class SeasonChanger : MonoBehaviour
 
     [SerializeField] private Season temporada;
     [SerializeField] private List<SpriteRenderer> spritesVerano = new List<SpriteRenderer>();
-    ///public GameObject verano;
     [SerializeField] private List<SpriteRenderer> spriteInvierno = new List<SpriteRenderer>();
-    ///  public GameObject invierno;
     [SerializeField] private List<SpriteRenderer> spriteOtono = new List<SpriteRenderer>();
-    ///  public GameObject otono;
     [SerializeField] private List<SpriteRenderer> spritePrimavera = new List<SpriteRenderer>();
-    ///  public GameObject primavera;
 
     public float FadeSpeed;
 
@@ -117,52 +113,6 @@ public class SeasonChanger : MonoBehaviour
     }
 
 
-
-    /*
-    private IEnumerator Fadetotemp(List<SpriteRenderer>actualSeason,List<SpriteRenderer>nextSeason)
-    {
-        if (nextSeason == actualSeason)
-        {
-            yield return null;
-        }
-        else
-        {
-            for (int f = 0; f < actualSeason.Count; f++)
-            {
-                Debug.Log("Entre");
-                while (actualSeason[f].color.a > 0f)
-                {
-                    Debug.Log(actualSeason[f].color.a);
-                    float fadeAmount = Mathf.Clamp(actualSeason[f].color.a - FadeSpeed * Time.deltaTime, 0, 1);
-                    Color objectColor = new Color(actualSeason[f].color.r, actualSeason[f].color.g, actualSeason[f].color.b, fadeAmount);
-                    actualSeason[f].color = objectColor;
-                }
-                Debug.Log("Sali");
-
-            }
-
-            for (int k = 0; k < nextSeason.Count; k++)
-            {
-                Debug.Log("Entre1");
-                while (nextSeason[k].color.a < 1)
-                {
-                    Debug.Log(nextSeason[k].color.a);
-                    float fadeAmountV = Mathf.Clamp(nextSeason[k].color.a + FadeSpeed * Time.deltaTime, 0, 1);
-                    Color objectVerano = new Color(nextSeason[k].color.r, nextSeason[k].color.g, nextSeason[k].color.b, fadeAmountV);
-                    nextSeason[k].color = objectVerano;
-
-                }
-                Debug.Log("Sali1");
-            }   
-                
-
-            
-            currentSeason = nextSeason;
-            yield return null;
-        }
-    }
-    */
-
     //SEGUNDA CORRUTINA. Utilizada para recorrer todos los sprites y luego llamar a cada uno para su alteración.
     // Si se le hace Fade In o Fade Out Dependera de la variable Incrementar
     // SI ES TRUE, procedera a hacer Fade In (Hacer niitda la imagen), SI ES FALSE, hará lo contrario.
@@ -175,6 +125,7 @@ public class SeasonChanger : MonoBehaviour
         }
 
     }
+
 
     //CORUTINA QUE HACE FADE IN O FADE OUT A UN SPRITE. El comportamiento depende de la variable Incrementar
     // SI ES TRUE, procedera a hacer Fade In (Hacer niitda la imagen), SI ES FALSE, hará lo contrario.

@@ -10,6 +10,8 @@ public class MainGame : MonoBehaviour
     [SerializeField]
     private BoardComponent _board = null;
     [SerializeField]
+    private BoardController _boardController = null;
+    [SerializeField]
     private PlantComponent _plant = null;
     [SerializeField]
     private CardInputUI _cardInput = null;
@@ -19,6 +21,10 @@ public class MainGame : MonoBehaviour
     private SeasonChanger _seasonMng = null;
     [SerializeField]
     private WeatherMgr _weatherMng = null;
+
+    // Components
+    [SerializeField]
+    private Camera _cam = null;
 
     // Visuals
     [SerializeField]
@@ -41,7 +47,7 @@ public class MainGame : MonoBehaviour
 
     private void Awake()
     {
-        _plant.OnUsedCard.AddListener(ReceiveUsedCard);
+        //_plant.OnUsedCard.AddListener(ReceiveUsedCard);
         _seasonMng.ChangeSeason(_startingSeason);
         _cardInput.ListenOnCardUsed(ReceiveUsedCard);
     }
@@ -72,8 +78,9 @@ public class MainGame : MonoBehaviour
         _cardInput.DiscardHand();
         _cardInput.DisableSystem();
 
-        _particles.UpdateParticles(Weather.NEUTRAL, _startingSeason);
+        _weatherMng.RestartWeather();
         _seasonMng.ChangeSeason(_startingSeason);
+        _particles.UpdateParticles(Weather.NEUTRAL, _startingSeason);
     }
 
 
@@ -95,6 +102,7 @@ public class MainGame : MonoBehaviour
     public void ReceiveUsedCard(GameCards card)
     {
         _receivedCard = card;
+        _failedCard = false;
         _successCard = true;
         _usedCard = true;
     }
@@ -103,6 +111,7 @@ public class MainGame : MonoBehaviour
     public void ReceiveCanceledCard(GameCards card)
     {
         _receivedCard = card;
+        _successCard = false;
         _failedCard = true;
         _usedCard = true;
     }
@@ -128,8 +137,9 @@ public class MainGame : MonoBehaviour
             _cardInput.EnableSystem();
             yield return new WaitUntil(() => _usedCard);
 
+            _successCard = false; // fua cosa boba aca
             _cardInput.DisableSystem();
-            ProcessCard(_receivedCard);
+            yield return StartCoroutine(ProcessCard(_receivedCard));
 
             yield return new WaitUntil(() => _successCard || _failedCard);
 
@@ -165,6 +175,10 @@ public class MainGame : MonoBehaviour
         RequestCardsForDeck();
         Season season = _seasonMng.TickSeason();
         Weather weather = _weatherMng.Tick(season);
+        BoardComponent.Collected plantCollected = _board.Tick(1, 1);
+
+        _plant.ChangeWaterCount(plantCollected.water);
+        _plant.UpdateNutrients(plantCollected.nutrients);
 
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(CardUseRoutine());
@@ -174,25 +188,117 @@ public class MainGame : MonoBehaviour
     }
 
 
-    private void ProcessCard(GameCards card)
+    private IEnumerator RockDestroyRoutine(GameCards card)
+    {
+        while (true)
+        {
+            yield return null;
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                Vector3 wpos = _cam.ScreenToWorldPoint(Input.mousePosition);
+                if (_board.DestroyRock(wpos))
+                {
+                    ReceiveUsedCard(card);
+                    yield break;
+                }
+                continue;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ReceiveCanceledCard(card);
+                yield break;
+            }
+        }
+    }
+
+
+    private IEnumerator DiscoverRoutine(GameCards card)
+    {
+        while (true)
+        {
+            yield return null;
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                Vector3 wpos = _cam.ScreenToWorldPoint(Input.mousePosition);
+                Debug.Log(wpos);
+                if (_board.DiscoverCell(wpos))
+                {
+                    ReceiveUsedCard(card);
+                    yield break;
+                }
+                continue;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ReceiveCanceledCard(card);
+                yield break;
+            }
+        }
+    }
+
+
+    private IEnumerator RootCreate(GameCards card)
+    {
+        UnityAction succAct = () => ReceiveUsedCard(card);
+        UnityAction cancAct = () => ReceiveCanceledCard(card);
+
+        _boardController.OnRootCreated.AddListener(succAct);
+        _boardController.OnRootCancel.AddListener(cancAct);
+
+        yield return StartCoroutine(_boardController.StartRootCreation(1));
+        _usedCard = false; // cosa rara
+
+        yield return new WaitUntil(() => _usedCard);
+
+        Debug.Log(_usedCard);
+        Debug.Log(_successCard);
+
+        _boardController.OnRootCreated.RemoveListener(succAct);
+        _boardController.OnRootCancel.RemoveListener(cancAct);
+    }
+
+
+    private IEnumerator ProcessCard(GameCards card)
     {
         switch (card.CardEffect)
         {
             case CardEffects.Move:
+                yield return StartCoroutine(RootCreate(card));
+                if (_successCard)
+                    _plant.ChangeWaterCount(-card.WaterCost);
+                break;
             case CardEffects.DivideRoot:
+                yield return StartCoroutine(RootCreate(card));
+                if (_successCard)
+                    _plant.ChangeWaterCount(-card.WaterCost);
+                break;
             case CardEffects.DiscoverMap:
+                yield return StartCoroutine(DiscoverRoutine(card));
+                if (_successCard)
+                    _plant.ChangeWaterCount(-card.WaterCost);
+                break;
             case CardEffects.BreakRock:
+                yield return StartCoroutine(RockDestroyRoutine(card));
+                if (_successCard)
+                    _plant.ChangeWaterCount(-card.WaterCost);
                 break;
             case CardEffects.QueueRain:
             case CardEffects.QueueCloudy:
+            case CardEffects.QueueSunny:
             case CardEffects.QueueNeutral:
+                _weatherMng.ReceiveCard(card);
+                _plant.ChangeWaterCount(-card.WaterCost);
+                _successCard = true;
                 break;
             case CardEffects.GainWater:
             case CardEffects.GainNutrient:
             case CardEffects.BetterWaterAbs:
             case CardEffects.GainLeaf:
                 _plant.ReceiveCard(card);
-                break;
+                _successCard = true;
+                yield break;
         }
     }
 }

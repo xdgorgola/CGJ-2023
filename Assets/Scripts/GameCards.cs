@@ -11,7 +11,7 @@ public enum CardEffects
     BreakRock,      // num: nro rocas descubiertas
     QueueRain,      // wait: dias de cola - dur: duracion clima
     QueueCloudy,    // wait: dias de cola - dur: duracion clima
-    QueueSunny,    // wait: dias de cola - dur: duracion clima
+    QueueSunny,     // wait: dias de cola - dur: duracion clima
     QueueNeutral,   // wait: dias de cola
     GainWater,      // quant: nro ganado
     GainNutrient,   // quant: nro ganado

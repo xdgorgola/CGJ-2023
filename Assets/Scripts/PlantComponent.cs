@@ -57,17 +57,13 @@ public class PlantComponent : MonoBehaviour
 
             _animator.SetTrigger("Die");
         }
-
     }
+
 
     public void UpdateNutrients(float cost)
     {
-        float newNutrients = Mathf.Clamp(nutrientes + cost, 0, maxNutrientes);
-        if (newNutrients < maxNutrientes && newNutrients > 0)
-        {
-            nutrientes = (int)newNutrients;
-        }
-        else if (newNutrients == maxNutrientes)
+        nutrientes = (int)Mathf.Clamp(nutrientes + cost, 0, maxNutrientes);
+        if (nutrientes == maxNutrientes)
         {
             if (OnNutrientsCap != null)
                 OnNutrientsCap.Invoke();
@@ -97,6 +93,7 @@ public class PlantComponent : MonoBehaviour
                 addLeaf();
                 break;
         }
+
         ChangeWaterCount(-card.WaterCost);
         if (OnUsedCard != null)
             OnUsedCard.Invoke(card);

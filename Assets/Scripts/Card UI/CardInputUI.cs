@@ -63,8 +63,6 @@ public class CardInputUI : MonoBehaviour
     private Coroutine _shrinkRoutine = null;
 
 
-    public GameCards testCard;
-
     private void Start()
     {
         for (int i = 0; i < _uiCards.Count; ++i)
@@ -150,8 +148,11 @@ public class CardInputUI : MonoBehaviour
 
     public void DiscardHand()
     {
+        _emptyCardsQ.Clear();
         for (int i = 0; i < _uiCards.Count; ++i)
         {
+            _emptyCardsQ.Enqueue(i);
+
             if (_cardHand[i] == null)
                 continue;
 
@@ -214,10 +215,9 @@ public class CardInputUI : MonoBehaviour
         _focusIndex = index;
         StartCoroutine(ConsumeCardRoutine(index));
 
-        if (OnCardUsed == null)
-            return;
+        if (OnCardUsed != null)
+            OnCardUsed.Invoke(_cardHand[index]);
 
-        OnCardUsed.Invoke(_cardHand[index]);
         _cardHand[index] = null;
         _emptyCardsQ.Enqueue(index);
     }
