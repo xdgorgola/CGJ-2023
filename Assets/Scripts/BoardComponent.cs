@@ -161,12 +161,6 @@ public class BoardComponent : MonoBehaviour
         InitRootSystem();
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.T))
-            Tick(20, 20);
-    }
-
     /// <summary>
     /// Update state of pickables in board. Take a specified amount of water and nutrients in every
     /// position with some pickable. Return collected resources at the end.
@@ -389,14 +383,14 @@ public class BoardComponent : MonoBehaviour
         return null;
     }
 
-    private Vector3Int BoardPosToTilemapPos(int i, int j) => new Vector3Int(j + _origin.x, -i + _origin.y, _origin.z);
+    public Vector3Int BoardPosToTilemapPos(int i, int j) => new Vector3Int(j + _origin.x, -i + _origin.y, _origin.z);
 
     /// <summary>
     /// Transform from world position to matrix position
     /// </summary>
     /// <param name="worldPosition"> Position in world coordinates, z coordinate is not important </param>
     /// <returns> null if outside of game matrix, (i,j) indices otherwise </returns>
-    private Vector2Int? WorldPosToBoardPos(Vector2 worldPosition)
+    public Vector2Int? WorldPosToBoardPos(Vector2 worldPosition)
     {
         Vector3Int cellPosition = _origin - _playableTilemap.WorldToCell(worldPosition);
         cellPosition.x *= -1; // PQC lol
@@ -635,7 +629,7 @@ public class BoardComponent : MonoBehaviour
         return false;
     }
 
-    public bool SetCellToRoot(int i,int j, int fromI, int fromJ, int reach = 1)
+    public bool SetCellToRoot(int i,int j, int fromI, int fromJ, int reach = 1, bool removeOriginalRoot = true)
     {
         if (!CanPlaceRootInCell(i, j, fromI, fromJ, reach))
             return false; // if can't place root here, just don't
@@ -645,7 +639,9 @@ public class BoardComponent : MonoBehaviour
 
         // TODO this is gonna crash when reach > 1 since we're not checking for intermediate cells
 
-        _rootEndpoints.Remove((fromI, fromJ));
+        if (removeOriginalRoot)
+            _rootEndpoints.Remove((fromI, fromJ));
+
         _rootEndpoints.Add((i, j));
 
         // Now we have to clear cells around new root 
@@ -667,6 +663,14 @@ public class BoardComponent : MonoBehaviour
         lineRenderer.SetPositions(new Vector3[] { startingPosition, endPosition });
 
         return true;
+    }
+
+    public void SetEndpointToRoot(int i, int j)
+    {
+        if (GetTypeOfCell(i, j, Layers.Roots) != TileTypes.RootEndpoint)
+            return;
+
+        SetTile(i, j, TileTypes.Root, Layers.Roots);
     }
 
     /// <summary>
