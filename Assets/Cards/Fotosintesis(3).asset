@@ -16,7 +16,7 @@ MonoBehaviour:
   _description: Gana 3 Nutrientes
   _picture: {fileID: 21300000, guid: a4f80a965ca742f4d81b7e65442cc4e3, type: 3}
   _waterCost: 1
-  _effect: 10
+  _effect: 9
   _params:
   - _paramName: quant
     _paramValue: 3
