@@ -41,21 +41,6 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && _state == RootCreationState.None)
-            StartCoroutine(StartRootCreation(1, false));
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-            StopRootCreation();
-    }
-
     public void StopRootCreation()
     {
         if (_state != RootCreationState.None && OnRootCancel != null)
@@ -63,7 +48,6 @@ public class BoardController : MonoBehaviour
 
         _state = RootCreationState.None;
     }
-
 
     public IEnumerator StartRootCreation(int nBranches = 1, bool allowMid = false)
     {
