@@ -276,7 +276,7 @@ public class BoardComponent : MonoBehaviour
     public bool DestroyRock(Vector2 worldPosition)
     {
         Vector2Int? boardPos = WorldPosToBoardPos(worldPosition);
-        if (boardPos is Vector2Int v && GetTypeOfCell(v.x, v.y) == TileTypes.Rock)
+        if (boardPos is Vector2Int v && GetTypeOfCell(v.x, v.y) == TileTypes.Rock && GetTypeOfCell(v.x, v.y, Layers.Visibility) != TileTypes.Invisible)
         {
             SetTile(v.x, v.y, TileTypes.Dirt);
             return true;

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
 
 [RequireComponent(typeof(BoardComponent))]
 public class BoardController : MonoBehaviour
@@ -9,6 +11,9 @@ public class BoardController : MonoBehaviour
     // Board implementing game logic
     private BoardComponent _board;
     private Coroutine _startRootCreation;
+
+    public UnityEvent OnRootCreated = new UnityEvent();
+    public UnityEvent OnRootCancel = new UnityEvent();
 
     // Used to draw a line from a cell to another when creating a new root
     private List<GameObject> _lineRenderForChoosingTiles;
@@ -46,14 +51,20 @@ public class BoardController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && _state == RootCreationState.None)
-            _startRootCreation = StartCoroutine(StartRootCreation(2));
+            _startRootCreation = StartCoroutine(StartRootCreation(1));
         
         if (Input.GetKeyDown(KeyCode.Escape))
             StopRootCreation();
 
     }
 
-    public void StopRootCreation() => _state = RootCreationState.None;
+    public void StopRootCreation()
+    {
+        if (_state != RootCreationState.None && OnRootCancel != null)
+            OnRootCancel.Invoke();
+
+        _state = RootCreationState.None;
+    }
    
 
     IEnumerator StartRootCreation(int nBranches = 1)
@@ -133,6 +144,9 @@ public class BoardController : MonoBehaviour
 
         _board.MarkRootableTiles(false);
         _state = RootCreationState.None;
+
+        if (OnRootCreated != null)
+            OnRootCreated.Invoke();
     }
 
     private Vector2 GetMousePositionInWorld() => _board.cam.ScreenToWorldPoint(Input.mousePosition);
