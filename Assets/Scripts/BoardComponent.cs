@@ -7,7 +7,7 @@ using System;
 [RequireComponent(typeof(LineRenderer))]
 public class BoardComponent : MonoBehaviour
 {
-    
+
     public struct Collected
     {
         public Collected(int water, int nutrients)
@@ -16,8 +16,8 @@ public class BoardComponent : MonoBehaviour
             this.nutrients = nutrients;
         }
 
-        public readonly int water; 
-        public readonly int nutrients; 
+        public readonly int water;
+        public readonly int nutrients;
     }
 
     public enum TileTypes
@@ -29,17 +29,17 @@ public class BoardComponent : MonoBehaviour
         Root = 4,
         RootEndpoint = 5,
         White = 6,
-        Water = 7, 
+        Water = 7,
         Nutrients = 8
     }
 
     public enum Layers
     {
         Ground = 0,
-        Roots = 1, 
+        Roots = 1,
         Visibility = 2,
         Playable = 3,
-        Overlays = 4, 
+        Overlays = 4,
         Pickables = 5 // Water, nutrients
     }
 
@@ -112,7 +112,7 @@ public class BoardComponent : MonoBehaviour
     private GameObject _grid;         // Grid containing tilemap
     [SerializeField]
     private Camera _cam;
-    public Camera cam { get { return _cam;  } }
+    public Camera cam { get { return _cam; } }
 
     private HashSet<(int, int)> _rootEndpoints; // Endpoint positions inside the matrix
     private Vector3Int _origin; // Top left corner of tilemap
@@ -125,7 +125,7 @@ public class BoardComponent : MonoBehaviour
     private LineRenderer _lineRender;
 
     // Line renders generated for each position, they're null when there's no root in that cell
-    private GameObject[,] _lineRenderObjects; 
+    private GameObject[,] _lineRenderObjects;
 
     private void Awake()
     {
@@ -172,11 +172,11 @@ public class BoardComponent : MonoBehaviour
     {
         int collectedWater = 0;
         int collectedNutr = 0;
-        for(int i = 0; i < _boardHeight; i ++)
-            for(int j = 0; j < _boardWidth; j++)
+        for (int i = 0; i < _boardHeight; i++)
+            for (int j = 0; j < _boardWidth; j++)
             {
                 TileTypes typeOfCell = GetTypeOfCell(i, j, Layers.Pickables);
-                if ( typeOfCell == TileTypes.Nothing || !IsRootCell(i,j))
+                if (typeOfCell == TileTypes.Nothing || !IsRootCell(i, j))
                     continue;
 
                 // Choose how much we will take from this cell
@@ -196,7 +196,7 @@ public class BoardComponent : MonoBehaviour
 
                 // This min prevents result from going bellow zero
                 int pickedAmount = Mathf.Min(_pickableAmount[i, j], amountToCollect);
-                _pickableAmount[i,j] -= pickedAmount;
+                _pickableAmount[i, j] -= pickedAmount;
 
                 // choose where to store the picked amount
                 switch (typeOfCell)
@@ -253,18 +253,18 @@ public class BoardComponent : MonoBehaviour
         for (int i = 0; i < _boardHeight; i++)
             for (int j = 0; j < _boardWidth; j++)
             {
-                Tile groundTile = (Tile) _groundTilemap.GetTile(BoardPosToTilemapPos(i, j));
-                Tile rootTile   = (Tile) _rootTilemap.GetTile(BoardPosToTilemapPos(i, j));
-                Tile visibilityTile  = (Tile) _visibilityTilemap.GetTile(BoardPosToTilemapPos(i, j));
-                Tile pickableTile  = (Tile) _pickables.GetTile(BoardPosToTilemapPos(i, j));
-                _board[(int)Layers.Ground, i,j] = TileToType(groundTile);
+                Tile groundTile = (Tile)_groundTilemap.GetTile(BoardPosToTilemapPos(i, j));
+                Tile rootTile = (Tile)_rootTilemap.GetTile(BoardPosToTilemapPos(i, j));
+                Tile visibilityTile = (Tile)_visibilityTilemap.GetTile(BoardPosToTilemapPos(i, j));
+                Tile pickableTile = (Tile)_pickables.GetTile(BoardPosToTilemapPos(i, j));
+                _board[(int)Layers.Ground, i, j] = TileToType(groundTile);
                 _board[(int)Layers.Roots, i, j] = TileToType(rootTile);
                 _board[(int)Layers.Visibility, i, j] = TileToType(visibilityTile);
                 _board[(int)Layers.Pickables, i, j] = TileToType(pickableTile);
 
                 // Also if this cell has a pickable, add its corresponding amount to the 
                 if (GetTypeOfCell(i, j, Layers.Pickables) != TileTypes.Nothing)
-                    _pickableAmount[i,j] = _defaultPickableAmount;
+                    _pickableAmount[i, j] = _defaultPickableAmount;
             }
     }
 
@@ -332,7 +332,7 @@ public class BoardComponent : MonoBehaviour
         return null;
     }
 
-    private TileTypes GetTypeOfCell(int i, int j, Layers layer = Layers.Ground) =>_board[(int)layer, i, j];    
+    private TileTypes GetTypeOfCell(int i, int j, Layers layer = Layers.Ground) => _board[(int)layer, i, j];
 
     private TileTypes TileToType(Tile tile)
     {
@@ -361,7 +361,7 @@ public class BoardComponent : MonoBehaviour
 
     private Tilemap GetTilemapOfLayer(Layers layer)
     {
-        switch(layer)
+        switch (layer)
         {
             case Layers.Ground:
                 return _groundTilemap;
@@ -408,15 +408,15 @@ public class BoardComponent : MonoBehaviour
     private void UpdateTileMap()
     {
         for (int layer = 0; layer < _nLayers; layer++)
-            for(int i = 0; i < _boardHeight; i++)
+            for (int i = 0; i < _boardHeight; i++)
                 for (int j = 0; j < _boardWidth; j++)
                 {
                     if (layer == (int)Layers.Playable) continue;
 
-                    Vector3Int p = BoardPosToTilemapPos(i,j);
+                    Vector3Int p = BoardPosToTilemapPos(i, j);
                     var type = _board[layer, i, j];
                     var tile = TypeToTile(type);
-                    var tilemap = GetTilemapOfLayer((Layers) layer);
+                    var tilemap = GetTilemapOfLayer((Layers)layer);
                     tilemap.SetTile(p, tile);
                 }
     }
@@ -496,10 +496,10 @@ public class BoardComponent : MonoBehaviour
 
         _rootEndpoints = new HashSet<(int, int)>();
         // Clear invisible cells where there's root
-        for(int i = 0; i < _boardHeight; i++)
-            for(int j = 0; j < _boardWidth; j++)
+        for (int i = 0; i < _boardHeight; i++)
+            for (int j = 0; j < _boardWidth; j++)
             {
-                if (IsRoot(_board[(int) Layers.Roots,i,j]))
+                if (IsRoot(_board[(int)Layers.Roots, i, j]))
                 {
                     for (int a = -1; a < 2; a++)
                         for (int b = -1; b < 2; b++)
@@ -510,17 +510,17 @@ public class BoardComponent : MonoBehaviour
                 }
 
                 // Find all root starting points
-                if (_board[(int)Layers.Roots, i,j] == TileTypes.RootEndpoint)
+                if (_board[(int)Layers.Roots, i, j] == TileTypes.RootEndpoint)
                     _rootEndpoints.Add((i, j));
             }
-        
+
         // make root tilemap invisible
-        for(int i = 0; i < _boardHeight; i++)
-            for(int j = 0; j < _boardWidth; j++)
+        for (int i = 0; i < _boardHeight; i++)
+            for (int j = 0; j < _boardWidth; j++)
             {
                 var position = BoardPosToTilemapPos(i, j);
                 _rootTilemap.SetTileFlags(position, TileFlags.None);
-                _rootTilemap.SetColor(position, new Color(0,0,0,0));
+                _rootTilemap.SetColor(position, new Color(0, 0, 0, 0));
             }
     }
 
@@ -534,55 +534,56 @@ public class BoardComponent : MonoBehaviour
         return false;
     }
 
-    public bool IsRootEndpoint(Vector2 worldPos)
+    public bool IsRootEndpoint(Vector2 worldPos, bool allowMid = false)
     {
         Vector2Int? boardCoords = WorldPosToBoardPos(worldPos);
 
         if (boardCoords is Vector2Int v)
-            return IsRootEndpoint(v.x, v.y);
+            return IsRootEndpoint(v.x, v.y, allowMid);
 
         return false;
     }
-    
+
+    public bool IsRootEndpoint(int i, int j, bool allowMid = false) => InsideBoard(i, j) && (allowMid || GetTypeOfCell(i, j, Layers.Roots) == TileTypes.RootEndpoint);
+
     public bool IsRootCell(int i, int j)
     {
         TileTypes typeOfTile = GetTypeOfCell(i, j, Layers.Roots);
         return typeOfTile == TileTypes.Root || typeOfTile == TileTypes.RootEndpoint;
     }
 
-    public bool IsRootEndpoint(int i, int j) => InsideBoard(i, j) && GetTypeOfCell(i, j, Layers.Roots) == TileTypes.RootEndpoint;
 
     public bool IsBlocked(int i, int j)
     {
-        return _board[(int) Layers.Ground,i,j] == TileTypes.Rock || _board[(int) Layers.Roots,i,j] != TileTypes.Nothing;
+        return _board[(int)Layers.Ground, i, j] == TileTypes.Rock || _board[(int)Layers.Roots, i, j] != TileTypes.Nothing;
     }
 
-    public bool CanPlaceRootInCell(Vector2 worldPosTo, Vector2 worldPosFrom, int reach = 1)
+    public bool CanPlaceRootInCell(Vector2 worldPosTo, Vector2 worldPosFrom, int reach = 1, bool allowMid = false)
     {
         // convert both positions to board coordinates
         Vector2Int? boardPosTo = WorldPosToBoardPos(worldPosTo);
         Vector2Int? boardPosFrom = WorldPosToBoardPos(worldPosFrom);
 
         if (boardPosTo is Vector2Int v0 && boardPosFrom is Vector2Int v1)
-            return CanPlaceRootInCell(v0.x, v0.y, v1.x, v1.y, reach);
+            return CanPlaceRootInCell(v0.x, v0.y, v1.x, v1.y, reach, allowMid);
 
         return false;
     }
 
-    public bool CanPlaceRootInCell(int i, int j, int fromI, int fromJ, int reach = 1)
+    public bool CanPlaceRootInCell(int i, int j, int fromI, int fromJ, int reach = 1, bool allowMid = false)
     {
         // from position is inside board and is a root endpoint?
-        if (!InsideBoard(fromI, fromJ) || !IsRootEndpoint(fromI, fromJ))
+        if (!InsideBoard(fromI, fromJ) || (!IsRootEndpoint(fromI, fromJ) && !allowMid))
             return false; // origin is not a valid start
 
         // Cell is empty and inside the board?
-        if (!InsideBoard(i,j) || IsBlocked(i,j) || IsRootCell(i,j))
+        if (!InsideBoard(i, j) || IsBlocked(i, j) || IsRootCell(i, j))
             return false; // not empty, can't place it there
 
         // Now we have to check if the specified position can be reached from the
         // starting position using the specified reach
-        for(int a = -1; a < 2; a ++)
-            for(int b = -1; b < 2; b++)
+        for (int a = -1; a < 2; a++)
+            for (int b = -1; b < 2; b++)
             {
                 if (a == b && a == 0 || !InsideBoard(i + a, j + b))
                     continue;
@@ -608,8 +609,8 @@ public class BoardComponent : MonoBehaviour
 
     public void ClearCellsAround(int i, int j, int reach = 1)
     {
-        for(int a = -reach; a <= reach; a++)
-            for(int b = -reach; b <= reach; b++)
+        for (int a = -reach; a <= reach; a++)
+            for (int b = -reach; b <= reach; b++)
             {
                 int newI, newJ;
                 newI = i + a;
@@ -627,16 +628,16 @@ public class BoardComponent : MonoBehaviour
         return false;
     }
 
-    public bool SetCellToRoot(int i,int j, int fromI, int fromJ, int reach = 1, bool removeOriginalRoot = true)
+    public bool SetCellToRoot(int i, int j, int fromI, int fromJ, int reach = 1, bool removeOriginalRoot = true, bool allowMid = false)
     {
-        if (!CanPlaceRootInCell(i, j, fromI, fromJ, reach))
+        if (!CanPlaceRootInCell(i, j, fromI, fromJ, reach, allowMid))
             return false; // if can't place root here, just don't
 
         SetTile(i, j, TileTypes.RootEndpoint, Layers.Roots);
 
         // TODO this is gonna crash when reach > 1 since we're not checking for intermediate cells
 
-        if (removeOriginalRoot && false)
+        if (removeOriginalRoot)
         {
             SetTile(fromI, fromJ, TileTypes.Root, Layers.Roots);
             _rootEndpoints.Remove((fromI, fromJ));
@@ -659,7 +660,7 @@ public class BoardComponent : MonoBehaviour
         // Specify endpoints for new line renderer
         Vector3 startingPosition = BoardPosToTilemapPos(fromI, fromJ) + new Vector3(0.5f, 0.5f, 0);
         Vector3 endPosition = BoardPosToTilemapPos(i, j) + new Vector3(0.5f, 0.5f, 0);
-        
+
         lineRenderer.SetPositions(new Vector3[] { startingPosition, endPosition });
 
         return true;
@@ -678,36 +679,61 @@ public class BoardComponent : MonoBehaviour
     /// Mark tiles as rootable when requested so 
     /// </summary>
     /// <param name="active">if tiles should be colored as active or turn invisible as unactive</param>
-    public void MarkRootableTiles(bool active = true)
+    public void MarkRootableTiles(bool active = true, bool allowMid = false)
     {
         Color color = _rootableTilesColor;
         if (!active)
             color.a = 0;
 
-        foreach (var (rootI, rootJ) in _rootEndpoints)
-            for (int i = 0; i < _boardHeight; i++)
-                for (int j = 0; j < _boardWidth; j++)
-                    if (!active || CanPlaceRootInCell(i, j, rootI, rootJ)) // when active es false, this will be true for any cell
-                    {
-                        var position = BoardPosToTilemapPos(i, j);
-                        SetTileAndRenderIt(i, j, TileTypes.White, Layers.Overlays);
-                        _overLays.SetTileFlags(position, TileFlags.None);
-                        _overLays.SetColor(position, color);
-                    }
+        for(int rootI = 0; rootI < _boardHeight; rootI ++)
+            for(int rootJ = 0; rootJ < _boardWidth; rootJ ++)
+            {
+                // if not a valid root 
+                if ((!allowMid && !_rootEndpoints.Contains((rootI, rootJ))) || !IsRootCell(rootI, rootJ))
+                    continue;
+
+                for (int i = 0; i < _boardHeight; i++)
+                    for (int j = 0; j < _boardWidth; j++)
+                        if (!active || CanPlaceRootInCell(i, j, rootI, rootJ, allowMid: allowMid)) // when active es false, this will be true for any cell
+                        {
+                            var position = BoardPosToTilemapPos(i, j);
+                            SetTileAndRenderIt(i, j, TileTypes.White, Layers.Overlays);
+                            _overLays.SetTileFlags(position, TileFlags.None);
+                            _overLays.SetColor(position, color);
+                        }
+
+            }
     }
 
-    public void MarkRootEndPoints(bool active = true)
+    public void MarkRootEndPoints(bool active = true, bool allowMid = false)
     {
         Color color = _rootableTilesColor;
         if (!active)
             color.a = 0;
 
-        foreach (var (rootI, rootJ) in _rootEndpoints)
+
+        if (!allowMid)
+            foreach (var (rootI, rootJ) in _rootEndpoints)
+            {
+                var position = BoardPosToTilemapPos(rootI, rootJ);
+                SetTileAndRenderIt(rootI, rootJ, TileTypes.White, Layers.Overlays);
+                _overLays.SetTileFlags(position, TileFlags.None);
+                _overLays.SetColor(position, color);
+            }
+        else
         {
-            var position = BoardPosToTilemapPos(rootI, rootJ);
-            SetTileAndRenderIt(rootI, rootJ, TileTypes.White, Layers.Overlays);
-            _overLays.SetTileFlags(position, TileFlags.None);
-            _overLays.SetColor(position, color);
+            for(int rootI = 0; rootI < _boardHeight; rootI++)
+                for(int rootJ = 0; rootJ < _boardWidth; rootJ++)
+                {
+                    if (!IsRootCell(rootI, rootJ))
+                        continue;
+
+                    var position = BoardPosToTilemapPos(rootI, rootJ);
+
+                    SetTileAndRenderIt(rootI, rootJ, TileTypes.White, Layers.Overlays);
+                    _overLays.SetTileFlags(position, TileFlags.None);
+                    _overLays.SetColor(position, color);
+                }
         }
     }
 
@@ -724,8 +750,8 @@ public class BoardComponent : MonoBehaviour
         // Check that splitting in root i,j is possible: In root i,j there's a root endpoint
         // and new root positions are rootable
         if (
-            GetTypeOfCell(rootI, rootJ, Layers.Roots) != TileTypes.RootEndpoint || 
-            !CanPlaceRootInCell(newRoot0i, newRoot0i, rootI, rootJ, reach) || 
+            GetTypeOfCell(rootI, rootJ, Layers.Roots) != TileTypes.RootEndpoint ||
+            !CanPlaceRootInCell(newRoot0i, newRoot0i, rootI, rootJ, reach) ||
             !CanPlaceRootInCell(newRoot1i, newRoot1i, rootI, rootJ, reach)
             )
             return false;

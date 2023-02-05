@@ -50,8 +50,8 @@ public class BoardController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && _state == RootCreationState.None)
-            StartCoroutine(StartRootCreation(1));
-        
+            StartCoroutine(StartRootCreation(1, false));
+
         if (Input.GetKeyDown(KeyCode.Escape))
             StopRootCreation();
     }
@@ -63,12 +63,12 @@ public class BoardController : MonoBehaviour
 
         _state = RootCreationState.None;
     }
-   
 
-    public IEnumerator StartRootCreation(int nBranches = 1)
+
+    public IEnumerator StartRootCreation(int nBranches = 1, bool allowMid = false)
     {
         // Mark where you can find root endpoints
-        _board.MarkRootEndPoints();
+        _board.MarkRootEndPoints(allowMid : allowMid);
         _state = RootCreationState.SelectingRoot;
 
         while (_state != RootCreationState.None)
@@ -76,11 +76,11 @@ public class BoardController : MonoBehaviour
             // Get Mouse input
             Vector2 mousePos = GetMousePositionInWorld();
 
-            if (Input.GetKeyDown(KeyCode.Mouse0) && _board.IsRootEndpoint(mousePos)) // Selected a valid position
+            if (Input.GetKeyDown(KeyCode.Mouse0) && _board.IsRootEndpoint(mousePos, allowMid)) // Selected a valid position
             {
                 // start new coroutine and exit
                 _state = RootCreationState.None;
-                StartCoroutine(StartNextTileSelection(mousePos, nBranches));
+                StartCoroutine(StartNextTileSelection(mousePos, nBranches, allowMid));
                 break;
             }
 
@@ -90,11 +90,11 @@ public class BoardController : MonoBehaviour
         _board.MarkRootEndPoints(false);
     }
 
-    public IEnumerator StartNextTileSelection(Vector2 startPos, int nBranchs = 1)
+    public IEnumerator StartNextTileSelection(Vector2 startPos, int nBranchs = 1, bool allowMid = false)
     {
         Debug.Assert(1 <= nBranchs && nBranchs <= 8, "Can't branch more than 8 times or less than 1");
         _state = RootCreationState.ExtendingRoot;
-        _board.MarkRootableTiles(true);
+        _board.MarkRootableTiles(true, allowMid);
         HashSet<Vector2Int> positionsToPlaceRoot = new();
 
 
@@ -105,7 +105,7 @@ public class BoardController : MonoBehaviour
             lineRender.enabled = true;
             lineRender.SetPosition(0, startPos);
 
-            while(_state != RootCreationState.None)
+            while (_state != RootCreationState.None)
             {
                 Vector2 nextPosition = GetMousePositionInWorld();
                 lineRender.SetPosition(1, nextPosition);
@@ -113,14 +113,14 @@ public class BoardController : MonoBehaviour
                 Vector2Int? boardPosition = _board.WorldPosToBoardPos(nextPosition);
 
                 if (
-                    boardPosition is Vector2Int v && 
-                    Input.GetKeyDown(KeyCode.Mouse0) && 
-                    _board.CanPlaceRootInCell(nextPosition, startPos) && 
+                    boardPosition is Vector2Int v &&
+                    Input.GetKeyDown(KeyCode.Mouse0) &&
+                    _board.CanPlaceRootInCell(nextPosition, startPos, allowMid: allowMid) &&
                     !positionsToPlaceRoot.Contains(v)
                     )
                 {
                     Vector3 cellPos = _board.BoardPosToTilemapPos(v.x, v.y);
-                    lineRender.SetPosition(1, cellPos + new Vector3(0.5f, 0.5f, 0f ));
+                    lineRender.SetPosition(1, cellPos + new Vector3(0.5f, 0.5f, 0f));
                     positionsToPlaceRoot.Add(v);
                     break;
                 }
@@ -130,17 +130,17 @@ public class BoardController : MonoBehaviour
         }
 
         // Now that we selected every branch position, we actually send them
-        foreach(Vector2Int pos in positionsToPlaceRoot)
-            _board.SetCellToRoot(pos.x, pos.y, startPosBoardCoords.x, startPosBoardCoords.y, removeOriginalRoot: false);
+        foreach (Vector2Int pos in positionsToPlaceRoot)
+            _board.SetCellToRoot(pos.x, pos.y, startPosBoardCoords.x, startPosBoardCoords.y, removeOriginalRoot: false, allowMid: allowMid);
 
         // Turn off old renders so that new ones can replace them
-        foreach(var renderHolder in _lineRenderForChoosingTiles)
+        foreach (var renderHolder in _lineRenderForChoosingTiles)
             renderHolder.GetComponent<LineRenderer>().enabled = false;
 
-        if (positionsToPlaceRoot.Count > 0 && false)
+        if (positionsToPlaceRoot.Count > 0)
             _board.SetEndpointToRoot(startPosBoardCoords.x, startPosBoardCoords.y);
 
-        _board.MarkRootableTiles(false);
+        _board.MarkRootableTiles(false, allowMid);
         _state = RootCreationState.None;
 
         if (OnRootCreated != null)
