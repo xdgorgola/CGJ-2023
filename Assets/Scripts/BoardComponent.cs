@@ -28,7 +28,9 @@ public class BoardComponent : MonoBehaviour
         Invisible = 3,
         Root = 4,
         RootEndpoint = 5,
-        White = 6
+        White = 6,
+        Water = 7, 
+        Nutrients = 8
     }
 
     public enum Layers
@@ -37,11 +39,18 @@ public class BoardComponent : MonoBehaviour
         Roots = 1, 
         Visibility = 2,
         Playable = 3,
-        Overlays = 4
+        Overlays = 4, 
+        Pickables = 5 // Water, nutrients
     }
 
     // -- < Internal logic > ------------------------------------------------
     private TileTypes[,,] _board;
+    private int[,] _pickableAmount;
+
+    [Tooltip("Amount of content of water/nutrients from the start")]
+    [Range(1, 100000)]
+    [SerializeField]
+    private int _defaultPickableAmount = 100;
 
     // Size of board
     private int _boardWidth;
@@ -61,7 +70,10 @@ public class BoardComponent : MonoBehaviour
     private Tilemap _playableTilemap;
     [SerializeField]
     private Tilemap _overLays;
+    [SerializeField]
+    private Tilemap _pickables;
 
+    [SerializeField]
     public bool _hidePlayableArea = true;
 
 
@@ -92,6 +104,11 @@ public class BoardComponent : MonoBehaviour
     private Tile _whiteTile;
 
     [SerializeField]
+    private Tile _waterTile;
+    [SerializeField]
+    private Tile _nutrientsTile;
+
+    [SerializeField]
     private GameObject _grid;         // Grid containing tilemap
     [SerializeField]
     private Camera _cam;
@@ -113,9 +130,6 @@ public class BoardComponent : MonoBehaviour
     private void Awake()
     {
         _lineRender = GetComponent<LineRenderer>();
-
-        // Properly set up origin first thing
-        SetUpTilemap();
     }
 
     // Start is called before the first frame update
@@ -126,13 +140,17 @@ public class BoardComponent : MonoBehaviour
         Debug.Assert(_rootTilemap != null, "Missing Root Tilemap component from board object");
         Debug.Assert(_visibilityTilemap != null, "Missing visibility Tilemap component from board object");
         Debug.Assert(_playableTilemap != null, "Missing playable Tilemap component from board object");
+        Debug.Assert(_pickables != null, "Missing pickable Tilemap component from board object");
         Debug.Assert(_defaultDirtTile != null, "Missing Dirt Tile property in board object");
         Debug.Assert(_defaultRockTile != null, "Missing Rock Tile property in board object");
         Debug.Assert(_rootTile != null, "Missing Root Tile property in board object");
         Debug.Assert(_rootTileEndpoint != null, "Missing Root Tile Endpoint property in board object");
         Debug.Assert(_whiteTile != null, "Missing white Tile property in board object");
+        Debug.Assert(_waterTile != null, "Missing water Tile property in board object");
+        Debug.Assert(_nutrientsTile != null, "Missing nutrients Tile property in board object");
         Debug.Assert(_grid != null, "Missing Grid property in board object");
         Debug.Assert(_cam != null, "Missing camera property in board object");
+
 
         // Hide playable area, the player doesn't need to know about it
         if (_hidePlayableArea)
@@ -143,19 +161,74 @@ public class BoardComponent : MonoBehaviour
         InitRootSystem();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.T))
+            Tick(20, 20);
     }
 
-    public Collected Tick()
+    /// <summary>
+    /// Update state of pickables in board. Take a specified amount of water and nutrients in every
+    /// position with some pickable. Return collected resources at the end.
+    /// </summary>
+    /// <param name="waterToCollect">Amount of water to collect</param>
+    /// <param name="nutrientToCollect">Amount of nutrients to collect</param>
+    /// <returns>Collected resources</returns>
+    public Collected Tick(int waterToCollect, int nutrientToCollect)
     {
-        return new Collected(0, 0);
+        int collectedWater = 0;
+        int collectedNutr = 0;
+        for(int i = 0; i < _boardHeight; i ++)
+            for(int j = 0; j < _boardWidth; j++)
+            {
+                TileTypes typeOfCell = GetTypeOfCell(i, j, Layers.Pickables);
+                if ( typeOfCell == TileTypes.Nothing || !IsRootCell(i,j))
+                    continue;
+
+                // Choose how much we will take from this cell
+                int amountToCollect = 0;
+                switch (typeOfCell)
+                {
+                    case TileTypes.Water:
+                        amountToCollect = waterToCollect;
+                        break;
+                    case TileTypes.Nutrients:
+                        amountToCollect = nutrientToCollect;
+                        break;
+                    default:
+                        Debug.LogError("Invalid type of tile");
+                        break;
+                }
+
+                // This min prevents result from going bellow zero
+                int pickedAmount = Mathf.Min(_pickableAmount[i, j], amountToCollect);
+                _pickableAmount[i,j] -= pickedAmount;
+
+                // choose where to store the picked amount
+                switch (typeOfCell)
+                {
+                    case TileTypes.Water:
+                        collectedWater += pickedAmount;
+                        break;
+                    case TileTypes.Nutrients:
+                        collectedNutr += pickedAmount;
+                        break;
+                    default:
+                        Debug.LogError("Invalid type of tile");
+                        break;
+                }
+
+                // Clear this cell if there are no resources remaining
+                if (_pickableAmount[i, j] == 0)
+                    SetTileAndRenderIt(i, j, TileTypes.Nothing, Layers.Pickables);
+            }
+
+        return new Collected(collectedWater, collectedNutr);
     }
 
     private void InitBoard()
     {
+
         // Init set of tiles
         _dirtSet = new HashSet<Tile>();
         foreach (var tile in _dirtTiles)
@@ -180,6 +253,7 @@ public class BoardComponent : MonoBehaviour
 
         _nLayers = Enum.GetNames(typeof(Layers)).Length;
         _board = new TileTypes[_nLayers, _boardHeight, _boardWidth];
+        _pickableAmount = new int[_boardHeight, _boardWidth];
 
         // Now we have to fill the internal board with the initial state of tilemaps
         for (int i = 0; i < _boardHeight; i++)
@@ -188,13 +262,16 @@ public class BoardComponent : MonoBehaviour
                 Tile groundTile = (Tile) _groundTilemap.GetTile(BoardPosToTilemapPos(i, j));
                 Tile rootTile   = (Tile) _rootTilemap.GetTile(BoardPosToTilemapPos(i, j));
                 Tile visibilityTile  = (Tile) _visibilityTilemap.GetTile(BoardPosToTilemapPos(i, j));
+                Tile pickableTile  = (Tile) _pickables.GetTile(BoardPosToTilemapPos(i, j));
                 _board[(int)Layers.Ground, i,j] = TileToType(groundTile);
                 _board[(int)Layers.Roots, i, j] = TileToType(rootTile);
                 _board[(int)Layers.Visibility, i, j] = TileToType(visibilityTile);
+                _board[(int)Layers.Pickables, i, j] = TileToType(pickableTile);
+
+                // Also if this cell has a pickable, add its corresponding amount to the 
+                if (GetTypeOfCell(i, j, Layers.Pickables) != TileTypes.Nothing)
+                    _pickableAmount[i,j] = _defaultPickableAmount;
             }
-
-
-
     }
 
     /// <summary>
@@ -231,15 +308,6 @@ public class BoardComponent : MonoBehaviour
         return false;
     }
 
-
-    private void SetUpTilemap()
-    {
-        // antes aqui hacia lo de cuadrar la escala, aqui creo que haremos el 
-        // tema del aspect ratio
-
-        
-    }
-
     private Tile TypeToTile(TileTypes type)
     {
         switch (type)
@@ -258,6 +326,10 @@ public class BoardComponent : MonoBehaviour
                 return _rootTileEndpoint;
             case TileTypes.Root:
                 return _rootTile;
+            case TileTypes.Water:
+                return _waterTile;
+            case TileTypes.Nutrients:
+                return _nutrientsTile;
             default:
                 Debug.LogError("Unknown Type of Tile. Maybe you forgot to handle a new type of tile?");
                 break;
@@ -272,19 +344,22 @@ public class BoardComponent : MonoBehaviour
     {
         if (_dirtSet.Contains(tile))
             return TileTypes.Dirt;
-        if (tile == null)
+        else if (tile == null)
             return TileTypes.Nothing;
-        if (_rockSet.Contains(tile))
+        else if (_rockSet.Contains(tile))
             return TileTypes.Rock;
-        if (_obscureSet.Contains(tile))
+        else if (_obscureSet.Contains(tile))
             return TileTypes.Invisible;
-        if (tile == _rootTile)
+        else if (tile == _rootTile)
             return TileTypes.Root;
-        if (tile == _rootTileEndpoint)
+        else if (tile == _rootTileEndpoint)
             return TileTypes.RootEndpoint;
-        if (tile == _whiteTile)
+        else if (tile == _whiteTile)
             return TileTypes.White;
-
+        else if (tile == _waterTile)
+            return TileTypes.Water;
+        else if (tile == _nutrientsTile)
+            return TileTypes.Nutrients;
 
         Debug.LogError("Unknown tile");
         return TileTypes.Nothing;
@@ -304,6 +379,8 @@ public class BoardComponent : MonoBehaviour
                 return _playableTilemap;
             case Layers.Overlays:
                 return _overLays;
+            case Layers.Pickables:
+                return _pickables;
             default:
                 Debug.LogError("Unknown layer type. Maybe you forgot to handle a new type of tile?");
                 break;
@@ -313,7 +390,6 @@ public class BoardComponent : MonoBehaviour
     }
 
     private Vector3Int BoardPosToTilemapPos(int i, int j) => new Vector3Int(j + _origin.x, -i + _origin.y, _origin.z);
-
 
     /// <summary>
     /// Transform from world position to matrix position
@@ -331,7 +407,6 @@ public class BoardComponent : MonoBehaviour
 
         return null;
     }
-
 
     /// <summary>
     /// Synch tilemap to match state of board
