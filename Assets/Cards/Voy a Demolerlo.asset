@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Voy a Demolerlo
   _description: Rompe 1 Roca
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: 19a1223fb2ee63d4aa2a69afe82e89a5, type: 3}
   _waterCost: 1
   _effect: 3
   _params:

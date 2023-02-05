@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Inversion(4)
   _description: Mejora el Ratio de Ganancia de agua en 1 por 4 turnos.
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: c7a43350f876e7a4984ca0f8b7518044, type: 3}
   _waterCost: 2
   _effect: 10
   _params:

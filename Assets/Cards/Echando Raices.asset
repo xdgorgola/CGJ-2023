@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Echando Raices
   _description: Mueve en una direccion alguna punta de tu raiz
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: affe7b2a49ca2f84b99e2dfbb9110bf0, type: 3}
   _waterCost: 3
   _effect: 0
   _params: []

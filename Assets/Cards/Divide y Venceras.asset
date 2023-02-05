@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Divide y Venceras
   _description: "Divide una Ra\xEDz en dos"
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: 8f2633d6bef821f4799a3de3ecd5b172, type: 3}
   _waterCost: 1
   _effect: 1
   _params: []
