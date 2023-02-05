@@ -5,14 +5,13 @@ using UnityEngine;
 
 public enum CardEffects
 {
-    MoveHor,        // mov: nro casillas
-    MoveVert,       // mov: nro casillas
-    MoveDiag,       // mov: nro casillas
+    Move,
     DivideRoot,     // no params
     DiscoverMap,    // num: nro casillas desbloqueadas
     BreakRock,      // num: nro rocas descubiertas
     QueueRain,      // wait: dias de cola - dur: duracion clima
     QueueCloudy,    // wait: dias de cola - dur: duracion clima
+    QueueSunny,    // wait: dias de cola - dur: duracion clima
     QueueNeutral,   // wait: dias de cola
     GainWater,      // quant: nro ganado
     GainNutrient,   // quant: nro ganado
