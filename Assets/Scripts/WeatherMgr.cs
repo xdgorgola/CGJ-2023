@@ -16,14 +16,19 @@ public class WeatherMgr : MonoBehaviour
 {
     private Weather clima_actual;
     private Weather sig_clima;
-    int turnos;
+    private Weather alt_clima;
+    private bool alter;
+    private int turnos;
+    private int alt_turnos;
 
-        // Start is called before the first frame update
+    // Start is called before the first frame update
     void Start()
     {
         clima_actual = Weather.NEUTRAL;
         sig_clima = Weather.NEUTRAL;
         turnos = 0;
+        alt_turnos = 0;
+        alter = false;
     }
 
     // Update is called once per frame
@@ -34,26 +39,52 @@ public class WeatherMgr : MonoBehaviour
 
     public Weather Tick(Season season)
     {
-        if (turnos == 0)
+        if (alter)
         {
-            if (clima_actual != Weather.NEUTRAL)
+            if (alt_turnos == 0)
             {
-                clima_actual = Weather.NEUTRAL;
+                clima_actual = alt_clima;
+                turnos = 2;
+                alter = false;
                 return clima_actual;
             }
             else
             {
-                clima_actual = sig_clima;
-                sig_clima = next_clima(season);
+                alt_turnos--;
                 return clima_actual;
             }
         }
-
         else
         {
-            turnos--;
-            return clima_actual;
+            if (turnos == 0)
+            {
+                turnos = 2;
+                if (clima_actual != Weather.NEUTRAL)
+                {
+                    clima_actual = Weather.NEUTRAL;
+                    return clima_actual;
+                }
+                else
+                {
+                    clima_actual = sig_clima;
+                    sig_clima = next_clima(season);
+                    return clima_actual;
+                }
+            }
+            else
+            {
+                turnos--;
+                return clima_actual;
+            }
         }
+    }
+
+    public void alter_weather(int turnos, Weather c)
+    {
+        alter = true;
+        alt_clima = c;
+        alt_turnos = turnos;
+
     }
 
 
