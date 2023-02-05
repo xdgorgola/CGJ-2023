@@ -11,6 +11,8 @@ public class StatBar : MonoBehaviour
 
     [SerializeField]
     private Image _fillImage;
+    [SerializeField]
+    private Text text;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,7 @@ public class StatBar : MonoBehaviour
     public void UpdateValue(int newValue)
     {
         float targetVal = (float)newValue / (float)_maxValue;
+        text.text = newValue.ToString();
         _fillImage.fillAmount = Mathf.Clamp(targetVal, 0, 1);
     }
 }
