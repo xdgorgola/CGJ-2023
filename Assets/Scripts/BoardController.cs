@@ -8,6 +8,14 @@ using UnityEngine.Events;
 public class BoardController : MonoBehaviour
 {
 
+    [SerializeField]
+    private bool _allowFreeBranching = false;
+
+    [Tooltip("Only used when Allowing free branching")]
+    [Range(1, 7)]
+    [SerializeField]
+    private int _nBranches = 1;
+
     // Board implementing game logic
     private BoardComponent _board;
 
@@ -39,6 +47,12 @@ public class BoardController : MonoBehaviour
             _board.SetUpLineRender(lineRender);
             lineRender.enabled = false;
         }
+    }
+
+    private void Update()
+    {
+        if (_allowFreeBranching && _state == RootCreationState.None && Input.GetKeyDown(KeyCode.Space))
+            StartCoroutine(StartRootCreation(_nBranches));
     }
 
     public void StopRootCreation()
