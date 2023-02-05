@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Vision Mejorada
   _description: Te permite ver una zona del mapa
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: 338559702cb131e4e82be216f7366049, type: 3}
   _waterCost: 1
   _effect: 2
   _params:

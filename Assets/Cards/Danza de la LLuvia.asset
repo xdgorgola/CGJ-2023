@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Danza de la LLuvia
   _description: "Invoca una lluv\xEDa en 3 d\xEDas durante 3 turnos\r"
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: 9e9b4134b6f09404bbb22b572237bf44, type: 3}
   _waterCost: 3
   _effect: 6
   _params:

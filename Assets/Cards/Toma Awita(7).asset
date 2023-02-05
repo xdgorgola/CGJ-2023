@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Toma Awita(7)
   _description: Gana 7 de Agua
-  _picture: {fileID: 0}
+  _picture: {fileID: 21300000, guid: 88a68414e50df2149af4a588cdef262b, type: 3}
   _waterCost: 2
   _effect: 8
   _params:
