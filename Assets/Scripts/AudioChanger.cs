@@ -19,7 +19,10 @@ public class AudioChanger : MonoBehaviour
     private AudioClip _fallClip = null;
     [SerializeField]
     private AudioClip _winterClip = null;
-
+    [SerializeField]
+    private AudioClip _loseClip = null;
+    [SerializeField]
+    private AudioClip _winClip = null;
 
     private void Start()
     {
@@ -43,6 +46,15 @@ public class AudioChanger : MonoBehaviour
         StartCoroutine(FadeAudiosRoutine(targetClip));
     }
 
+    public void ChangeAudioLose()
+    {
+        StartCoroutine(FadeAudiosRoutine(_loseClip));
+    }
+
+    public void ChangeAudioWin()
+    {
+        StartCoroutine(FadeAudiosRoutine(_winClip));
+    }
 
     private IEnumerator FadeAudiosRoutine(AudioClip targetClip)
     {

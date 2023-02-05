@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum Season
 {
@@ -29,6 +30,8 @@ public class SeasonChanger : MonoBehaviour
     [SerializeField]
     private int topeSeason = 12;// para asegurar 12 turnos
 
+    public UnityEvent<Season> OnSeasonChanged;
+
     public void Start()
     {
         currentSeason = spritePrimavera;
@@ -51,6 +54,8 @@ public class SeasonChanger : MonoBehaviour
     {
         temporada = val;
         Cambiador();
+        if (OnSeasonChanged != null)
+            OnSeasonChanged.Invoke(val);
     }
 
     //ESTO ES PARA EL DROPDOWN
