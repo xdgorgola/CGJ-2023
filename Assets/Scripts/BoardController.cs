@@ -53,6 +53,8 @@ public class BoardController : MonoBehaviour
     {
         if (_allowFreeBranching && _state == RootCreationState.None && Input.GetKeyDown(KeyCode.Space))
             StartCoroutine(StartRootCreation(_nBranches));
+        if (_allowFreeBranching && _state != RootCreationState.None && Input.GetKeyDown(KeyCode.Escape))
+            StopRootCreation();
     }
 
     public void StopRootCreation()
